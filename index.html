@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripSplit | Beautiful Expense Tracker</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                              radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Sidebar | Main Content */
+            gap: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 { margin-bottom: 1rem; letter-spacing: -0.5px; }
+        h1 { font-weight: 800; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; color: transparent; }
+
+        /* Inputs & Forms */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+        
+        input, select {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); margin-top: 5px; }
+        .btn-outline:hover { border-color: white; color: white; }
+
+        /* Travelers Checkboxes */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-pill {
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-pill input { display: none; }
+        .checkbox-pill span {
+            display: block;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .checkbox-pill input:checked + span {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* List Styling */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .list-item:last-child { border-bottom: none; }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Balances */
+        .balance-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+
+        /* Delete Icons */
+        .delete-btn { color: var(--danger); cursor: pointer; margin-left: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside>
+            <div class="card">
+                <h1><i class="fas fa-plane-departure"></i> TripSplit</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Manage expenses together.</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-coins"></i> Currencies</h3>
+                <div class="form-group">
+                    <input type="text" id="newCurrency" placeholder="e.g. USD, EUR, INR">
+                    <button class="btn-outline" onclick="addCurrency()">Add Currency</button>
+                </div>
+                <div id="currencyList" style="display: flex; gap: 5px; flex-wrap: wrap;"></div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-users"></i> Travelers</h3>
+                <div class="form-group">
+                    <input type="text" id="newTraveler" placeholder="Enter Name">
+                    <button class="btn-outline" onclick="addTraveler()">Add Traveler</button>
+                </div>
+                <div id="travelerList" style="margin-top: 10px;"></div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center;">
+                <div>
+                    <h3>Trip Summary</h3>
+                    <div style="margin-bottom: 20px;">
+                        <h1 id="totalSpendDisplay">0</h1>
+                        <span style="color: var(--text-muted);">Total Spent</span>
+                    </div>
+                </div>
+                <div style="height: 150px; position: relative;">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-balance-scale"></i> Who Owes What</h3>
+                <div id="balancesList">
+                    <p style="color: var(--text-muted); font-style: italic;">Add expenses to see balances...</p>
+                </div>
+             </div>
+
+            <div class="card">
+                <h3><i class="fas fa-plus-circle"></i> Add Expense</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="descInput" placeholder="Dinner, Taxi, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="amountInput" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <select id="currencySelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="categorySelect">
+                            <option value="Food">🍔 Food</option>
+                            <option value="Transport">🚕 Transport</option>
+                            <option value="Stay">🏨 Stay</option>
+                            <option value="Activity">🎫 Activity</option>
+                            <option value="Misc">📦 Misc</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Paid By</label>
+                    <select id="payerSelect"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Split Among (Uncheck if not involved)</label>
+                    <div id="splitCheckboxes" class="checkbox-group"></div>
+                </div>
+
+                <button class="btn-primary" onclick="addExpense()">Add Expense</button>
+            </div>
+
+            <div class="card">
+                <h3>Recent Activity</h3>
+                <div id="expensesList"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            // 🔴 IMPORTANT: You must Fill in your API Key and App ID below from Firebase Console
+            apiKey: "YOUR_API_KEY_HERE", 
+            authDomain: "project008-d245d.firebaseapp.com",
+            // This is the URL you provided
+            databaseURL: "https://project008-d245d-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "project008-d245d",
+            storageBucket: "project008-d245d.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- GLOBAL STATE ---
+        let travelers = [];
+        let currencies = ['USD']; // Default
+        let expenses = [];
+        let chartInstance = null;
+
+        // --- FUNCTIONS ---
+
+        window.addTraveler = () => {
+            const name = document.getElementById('newTraveler').value;
+            if(!name) return;
+            const newRef = push(ref(db, 'travelers'));
+            set(newRef, { name: name });
+            document.getElementById('newTraveler').value = '';
+        }
+
+        window.addCurrency = () => {
+            const code = document.getElementById('newCurrency').value.toUpperCase();
+            if(!code) return;
+            const newRef = push(ref(db, 'currencies'));
+            set(newRef, { code: code });
+            document.getElementById('newCurrency').value = '';
+        }
+
+        window.deleteItem = (path) => {
+            remove(ref(db, path));
+        }
+
+        window.addExpense = () => {
+            const desc = document.getElementById('descInput').value;
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const currency = document.getElementById('currencySelect').value;
+            const category = document.getElementById('categorySelect').value;
+            const payer = document.getElementById('payerSelect').value;
+            
+            // Get involved people
+            const involved = [];
+            document.querySelectorAll('.split-checkbox:checked').forEach(cb => {
+                involved.push(cb.value);
+            });
+
+            if(!desc || !amount || !payer || involved.length === 0) {
+                alert("Please fill all fields and select at least one person to split with.");
+                return;
+            }
+
+            const newExpense = {
+                desc, amount, currency, category, payer, involved, 
+                date: new Date().toISOString()
+            };
+
+            push(ref(db, 'expenses'), newExpense);
+            
+            // Reset form
+            document.getElementById('descInput').value = '';
+            document.getElementById('amountInput').value = '';
+        }
+
+        // --- LISTENERS (REALTIME UPDATES) ---
+
+        // 1. Listen for Travelers
+        onValue(ref(db, 'travelers'), (snapshot) => {
+            const data = snapshot.val();
+            const listDiv = document.getElementById('travelerList');
+            const payerSelect = document.getElementById('payerSelect');
+            const splitDiv = document.getElementById('splitCheckboxes');
+            
+            listDiv.innerHTML = '';
+            payerSelect.innerHTML = '';
+            splitDiv.innerHTML = '';
+            travelers = [];
+
+            if(data) {
+                Object.entries(data).forEach(([key, value]) => {
+                    travelers.push(value.name);
+                    
+                    // Sidebar List
+                    listDiv.innerHTML += `
+                        <div class="list-item">
+                            <span><i class="fas fa-user"></i> ${value.name}</span>
+                            <i class="fas fa-trash delete-btn" onclick="deleteItem('travelers/${key}')"></i>
+                        </div>`;
+
+                    // Payer Select
+                    const opt = document.createElement('option');
+                    opt.value = value.name;
+                    opt.innerText = value.name;
+                    payerSelect.appendChild(opt);
+
+                    // Split Checkboxes
+                    splitDiv.innerHTML += `
+                        <label class="checkbox-pill">
+                            <input type="checkbox" class="split-checkbox" value="${value.name}" checked>
+                            <span>${value.name}</span>
+                        </label>
+                    `;
+                });
+            }
+            calculateBalances(); // Recalculate if travelers change
+        });
+
+        // 2. Listen for Currencies
+        onValue(ref(db, 'currencies'), (snapshot) => {
+            const data = snapshot.val();
+            const listDiv = document.getElementById('currencyList');
+            const selectDiv = document.getElementById('currencySelect');
+            
+            listDiv.innerHTML = '';
+            selectDiv.innerHTML = '';
+            
+            // Default USD if empty
+            if(!data) {
+                selectDiv.innerHTML = '<option value="USD">USD</option>';
+            } else {
+                Object.entries(data).forEach(([key, value]) => {
+                    // Sidebar tags
+                    listDiv.innerHTML += `<span class="badge" onclick="deleteItem('currencies/${key}')" style="cursor:pointer; border:1px solid #aaa;">${value.code} &times;</span>`;
+                    
+                    // Select Options
+                    const opt = document.createElement('option');
+                    opt.value = value.code;
+                    opt.innerText = value.code;
+                    selectDiv.appendChild(opt);
+                });
+            }
+        });
+
+        // 3. Listen for Expenses
+        onValue(ref(db, 'expenses'), (snapshot) => {
+            const data = snapshot.val();
+            const listDiv = document.getElementById('expensesList');
+            listDiv.innerHTML = '';
+            expenses = [];
+            let total = 0;
+
+            if(data) {
+                // Convert object to array and reverse for recent first
+                const entries = Object.entries(data).reverse();
+                
+                entries.forEach(([key, ex]) => {
+                    expenses.push(ex);
+                    total += ex.amount; // Note: Simple sum, ignores currency conversion for MVP
+
+                    listDiv.innerHTML += `
+                        <div class="list-item">
+                            <div>
+                                <div style="font-weight:600;">${ex.desc}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">
+                                    ${ex.payer} paid for ${ex.involved.length} people • <span class="badge">${ex.category}</span>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:bold; color:var(--secondary);">${ex.currency} ${ex.amount}</div>
+                                <i class="fas fa-trash delete-btn" style="font-size:0.8rem;" onclick="deleteItem('expenses/${key}')"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('totalSpendDisplay').innerText = total.toFixed(2);
+            calculateBalances();
+            updateChart();
+        });
+
+        // --- LOGIC: CALCULATE WHO OWES WHO ---
+        function calculateBalances() {
+            let balances = {};
+            travelers.forEach(t => balances[t] = 0);
+
+            expenses.forEach(ex => {
+                const paidBy = ex.payer;
+                const splitAmount = ex.amount / ex.involved.length;
+
+                // Payer gets positive (they are owed money)
+                if(balances[paidBy] !== undefined) balances[paidBy] += ex.amount;
+
+                // Everyone involved gets negative (they owe money)
+                ex.involved.forEach(person => {
+                    if(balances[person] !== undefined) balances[person] -= splitAmount;
+                });
+            });
+
+            const balanceDiv = document.getElementById('balancesList');
+            balanceDiv.innerHTML = '';
+
+            Object.entries(balances).forEach(([person, amount]) => {
+                const colorClass = amount >= 0 ? 'positive' : 'negative';
+                const text = amount >= 0 ? `Gets back` : `Owes`;
+                balanceDiv.innerHTML += `
+                    <div class="balance-row">
+                        <span>${person}</span>
+                        <span class="${colorClass}" style="font-weight:bold;">
+                            ${text} ${Math.abs(amount).toFixed(2)}
+                        </span>
+                    </div>
+                `;
+            });
+        }
+
+        // --- CHART VISUALIZATION ---
+        function updateChart() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // Aggregate by category
+            const categories = {};
+            expenses.forEach(ex => {
+                categories[ex.category] = (categories[ex.category] || 0) + ex.amount;
+            });
+
+            const data = {
+                labels: Object.keys(categories),
+                datasets: [{
+                    data: Object.values(categories),
+                    backgroundColor: ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#64748b'],
+                    borderWidth: 0
+                }]
+            };
+
+            if(chartInstance) chartInstance.destroy();
+            
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
