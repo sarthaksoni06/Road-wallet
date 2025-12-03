@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de BRO | Multi-Trip & Simplify</title>
+    <title>Paise de Bro | Smart Expense Splitter</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #ec4899;
+            --primary: #8b5cf6; /* Violet */
+            --accent: #f43f5e;  /* Rose */
             --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-bg: rgba(30, 41, 59, 0.6);
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #10b981;
-            --danger: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
             background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            /* Dynamic animated gradient background */
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
             color: var(--text);
             min-height: 100vh;
             padding: 2rem;
@@ -36,72 +33,115 @@
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
-        
-        /* Layouts */
         .hidden { display: none !important; }
-        .grid-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
-        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
 
-        /* Cards */
+        /* --- GLASSCARDS --- */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            transition: 0.3s ease;
         }
 
-        /* Typography */
-        h1 { font-weight: 800; background: linear-gradient(to right, #818cf8, #f472b6); -webkit-background-clip: text; color: transparent; margin-bottom: 1rem;}
-        h2, h3 { margin-bottom: 1rem; color: var(--text); }
+        h1 { 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+            margin-bottom: 0.5rem;
+        }
+        h3 { font-weight: 600; letter-spacing: 0.5px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
 
-        /* Inputs & Buttons */
+        /* --- INPUTS --- */
         input, select {
-            width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            padding: 0.75rem; border-radius: 8px; color: white; outline: none; margin-bottom: 10px;
+            width: 100%; 
+            background: rgba(15, 23, 42, 0.6); 
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem; 
+            border-radius: 12px; 
+            color: white; 
+            outline: none; 
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
         }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        /* --- BUTTONS --- */
         button {
-            width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            width: 100%; padding: 1rem; border: none; border-radius: 12px; 
+            font-weight: 700; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
         }
-        .btn-primary { background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; }
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
-        .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
-
-        /* Trip Selection Screen */
-        .trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
-        .trip-card { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
-        .trip-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-
-        /* Payment Optimization Section */
-        .settlement-card {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .btn-primary { 
+            background: linear-gradient(90deg, var(--primary), var(--accent)); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
-        .arrow-icon { color: var(--text-muted); margin: 0 10px; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-danger { background: rgba(244, 63, 94, 0.15); color: var(--accent); border: 1px solid var(--accent); }
 
-        /* Checkboxes */
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        .checkbox-pill span {
-            display: block; padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.05);
-            border-radius: 20px; font-size: 0.8rem; cursor: pointer; user-select: none;
-            border: 1px solid transparent;
+        /* --- UNIQUE SELECTION GRID (THE NEW UI) --- */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
         }
-        .checkbox-pill input:checked + span { background: var(--primary); border-color: var(--secondary); }
-        .checkbox-pill input { display: none; }
 
-        /* Lists */
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; background: rgba(255,255,255,0.1); }
+        .person-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .person-card:hover { background: rgba(255,255,255,0.08); }
+
+        /* Selected State */
+        .person-card.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .person-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; color: var(--text-muted); }
+        .person-card.active i { color: white; }
+        .person-card input { display: none; } /* Hide actual checkbox */
+
+        /* --- LAYOUT --- */
+        .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
+        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+
+        .list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+
+        /* --- CATEGORY TAGS --- */
+        .cat-tag {
+            font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; 
+            background: rgba(255,255,255,0.1); text-transform: uppercase; margin-left: 8px;
+        }
+        
+        /* --- SETTLEMENTS --- */
+        .settle-row {
+            background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success);
+            padding: 10px; margin-bottom: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
     </style>
 </head>
 <body>
@@ -109,95 +149,106 @@
     <div class="container">
         
         <div id="tripSelectorView">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h1 style="font-size: 3rem;">Paise de Bro</h1>
-                <p style="color: var(--text-muted);">Select a trip or create a new one to start splitting.</p>
+            <div style="text-align: center; margin-top: 10vh; margin-bottom: 3rem;">
+                <h1 style="font-size: 4rem;">Paise de Bro</h1>
+                <p style="color: var(--text-muted); font-size: 1.2rem;">Select a trip. Split the bill. Keep friendships.</p>
             </div>
 
-            <div class="card" style="max-width: 500px; margin: 0 auto 2rem auto;">
-                <h3><i class="fas fa-suitcase"></i> Create New Trip</h3>
-                <input type="text" id="newTripName" placeholder="Trip Name (e.g. Paris 2024)">
-                <button class="btn-primary" onclick="createTrip()">Create Trip</button>
+            <div class="card" style="max-width: 400px; margin: 0 auto;">
+                <input type="text" id="newTripName" placeholder="Where are you going? (e.g. Goa 2025)">
+                <button class="btn-primary" onclick="createTrip()">Start New Trip</button>
             </div>
 
-            <div id="tripsList" class="trip-grid">
-                </div>
+            <div style="text-align: center; margin-top: 3rem;">
+                <h3 style="justify-content: center; color: var(--text-muted);">Your Trips</h3>
+                <div id="tripsList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;"></div>
+            </div>
         </div>
 
         <div id="dashboardView" class="hidden">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
-                    <button onclick="goHome()" class="btn-secondary" style="width: auto; padding: 5px 15px; font-size: 0.8rem; margin-bottom: 5px;">
-                        <i class="fas fa-arrow-left"></i> All Trips
+                    <button onclick="goHome()" style="width: auto; background: transparent; color: var(--text-muted); padding: 0;">
+                        <i class="fas fa-arrow-left"></i> Back
                     </button>
-                    <h1 id="currentTripTitle" style="margin: 0;">Trip Name</h1>
+                    <h1 id="currentTripTitle" style="margin-top: 10px;">Goa 2025</h1>
                 </div>
-                <button class="btn-danger" style="width: auto;" onclick="deleteCurrentTrip()">
-                    <i class="fas fa-trash"></i> Delete Trip
+                <button class="btn-danger" style="width: auto; padding: 0.5rem 1rem;" onclick="deleteCurrentTrip()">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
 
             <div class="grid-layout">
                 <aside>
                     <div class="card">
-                        <h3><i class="fas fa-users"></i> Travelers</h3>
-                        <div style="display: flex; gap: 5px;">
+                        <h3><i class="fas fa-user-plus"></i> The Squad</h3>
+                        <div style="display: flex; gap: 8px;">
                             <input type="text" id="newTraveler" placeholder="Name">
-                            <button class="btn-primary" style="width: auto;" onclick="addTraveler()"><i class="fas fa-plus"></i></button>
+                            <button class="btn-primary" style="width: auto;" onclick="addTraveler()">Add</button>
                         </div>
-                        <div id="travelerList"></div>
+                        <div id="travelerList" style="margin-top: 10px;"></div>
                     </div>
 
                     <div class="card">
-                        <h3><i class="fas fa-coins"></i> Currencies</h3>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="text" id="newCurrency" placeholder="Code (USD)">
-                            <button class="btn-secondary" style="width: auto;" onclick="addCurrency()"><i class="fas fa-plus"></i></button>
+                        <h3><i class="fas fa-wallet"></i> Top Spenders</h3>
+                        <div id="spendingList">
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Add expenses to see stats.</p>
                         </div>
-                        <div id="currencyList" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
                     </div>
 
-                    <div class="card" style="border-color: var(--success);">
-                        <h3><i class="fas fa-magic"></i> Simplified Debts</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
-                            Follow these steps to settle all debts with minimum transactions.
-                        </p>
-                        <div id="simplifiedSettlements">
-                            </div>
+                    <div class="card">
+                        <h3><i class="fas fa-handshake"></i> Settlements</h3>
+                        <div id="simplifiedSettlements"></div>
+                    </div>
+
+                    <div class="card" style="opacity: 0.7;">
+                        <h3><i class="fas fa-cog"></i> Settings</h3>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="newCurrency" placeholder="Add Currency (EUR)">
+                            <button onclick="addCurrency()" style="width: auto;">+</button>
+                        </div>
+                        <div id="currencyDisplay" style="margin-top: 5px; font-size: 0.8rem; color: var(--text-muted);"></div>
                     </div>
                 </aside>
 
                 <main>
-                    <div class="card" style="display: flex; gap: 20px; align-items: center;">
-                        <div style="flex: 1;">
-                            <span style="color: var(--text-muted);">Total Cost</span>
-                            <h2 id="totalCostDisplay">0.00</h2>
-                        </div>
-                        <div style="height: 100px; width: 100px;">
-                            <canvas id="miniChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3><i class="fas fa-receipt"></i> Add Expense</h3>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
-                            <input type="text" id="descInput" placeholder="Description">
-                            <input type="number" id="amountInput" placeholder="Amount">
-                        </div>
+                    <div class="card" style="border: 1px solid var(--primary);">
+                        <h3 style="color: var(--primary);"><i class="fas fa-receipt"></i> Add New Expense</h3>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <select id="currencySelect"></select>
-                            <select id="payerSelect"><option>Payer</option></select>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                            <input type="text" id="descInput" placeholder="What was it? (e.g. Dinner)">
+                            <input type="number" id="amountInput" placeholder="0.00">
                         </div>
 
-                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin: 10px 0 5px;">Split With:</label>
-                        <div id="splitCheckboxes" class="checkbox-group"></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <select id="currencySelect"></select>
+                            <select id="categorySelect">
+                                <option value="Food">🍔 Food</option>
+                                <option value="Travel">🚕 Travel</option>
+                                <option value="Stay">🏨 Stay</option>
+                                <option value="Fun">🍺 Fun</option>
+                                <option value="Groceries">🍎 Groceries</option>
+                                <option value="Misc">📦 Misc</option>
+                            </select>
+                            <select id="payerSelect">
+                                <option disabled selected>Who Paid?</option>
+                            </select>
+                        </div>
+
+                        <p style="margin: 15px 0 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                            Split with whom? (Select to include)
+                        </p>
+                        <div id="splitSelector" class="selection-grid">
+                            </div>
 
                         <button class="btn-primary" onclick="addExpense()">Add Expense</button>
                     </div>
 
                     <div class="card">
-                        <h3>Recent Activity</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                            <h3>Recent Activity</h3>
+                            <h2 id="totalCostDisplay" style="color:white;">0.00</h2>
+                        </div>
                         <div id="expensesList"></div>
                     </div>
                 </main>
@@ -209,9 +260,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // 🔴🔴 FILL THIS IN 🔴🔴
+        // 🔴🔴 FILL THIS IN WITH YOUR KEYS 🔴🔴
         const firebaseConfig = {
-            apiKey: "YAIzaSyB1L79JF2HhJA_s7r_p3jsdMLi0tAYsTcc", 
+            apiKey: "AIzaSyB1L79JF2HhJA_s7r_p3jsdMLi0tAYsTcc", 
             authDomain: "project008-d245d.firebaseapp.com",
             databaseURL: "https://project008-d245d-default-rtdb.asia-southeast1.firebasedatabase.app/",
             projectId: "project008-d245d",
@@ -223,120 +274,116 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // State
+        // State variables
         let currentTripId = null;
         let travelers = [];
         let expenses = [];
-        let currencies = ['USD'];
-        let chartInstance = null;
+        let currencies = [];
 
-        // --- NAVIGATION ---
+        // --- NAVIGATION & SETUP ---
+        
         window.createTrip = () => {
             const name = document.getElementById('newTripName').value;
             if(!name) return;
             const newRef = push(ref(db, 'trips'));
-            set(newRef, { 
-                meta: { name: name, created: Date.now() },
-                currencies: { 'default': { code: 'USD' } } // Default currency
-            });
+            set(newRef, { meta: { name: name, created: Date.now() } });
             document.getElementById('newTripName').value = '';
         }
 
-        window.loadTrip = (tripId, tripName) => {
-            currentTripId = tripId;
+        window.loadTrip = (id, name) => {
+            currentTripId = id;
             document.getElementById('tripSelectorView').classList.add('hidden');
             document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('currentTripTitle').innerText = tripName;
-            
-            // Initialize Listeners for this specific trip
-            listenToTripData();
+            document.getElementById('currentTripTitle').innerText = name;
+            startListeners();
         }
 
-        window.goHome = () => {
-            currentTripId = null;
-            document.getElementById('dashboardView').classList.add('hidden');
-            document.getElementById('tripSelectorView').classList.remove('hidden');
-            // Remove listeners could be done here in a robust app, but okay for simple usage
-            location.reload(); // Simple reload to clear state
-        }
+        window.goHome = () => { location.reload(); }
 
         window.deleteCurrentTrip = () => {
-            if(confirm("Are you sure? This will delete all data for this trip.")) {
+            if(confirm("Delete this trip forever?")) {
                 remove(ref(db, `trips/${currentTripId}`));
                 goHome();
             }
         }
 
-        // --- ROOT LISTENER (Load all trips) ---
+        // --- GLOBAL LISTENER (LANDING PAGE) ---
         onValue(ref(db, 'trips'), (snapshot) => {
             const data = snapshot.val();
             const list = document.getElementById('tripsList');
             list.innerHTML = '';
-            
             if(data) {
                 Object.entries(data).forEach(([key, val]) => {
-                    const name = val.meta ? val.meta.name : 'Untitled Trip';
                     list.innerHTML += `
-                        <div class="card trip-card" onclick="loadTrip('${key}', '${name}')">
-                            <h3>${name}</h3>
-                            <p style="color: var(--text-muted); font-size: 0.8rem;">Tap to manage</p>
-                        </div>
-                    `;
+                        <div onclick="loadTrip('${key}', '${val.meta.name}')" 
+                             style="background:rgba(255,255,255,0.05); padding:1rem 2rem; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
+                            <h4 style="margin:0;">${val.meta.name}</h4>
+                        </div>`;
                 });
             }
         });
 
-        // --- TRIP SPECIFIC LOGIC ---
+        // --- TRIP LISTENERS ---
 
-        function listenToTripData() {
+        function startListeners() {
             // 1. Travelers
-            onValue(ref(db, `trips/${currentTripId}/travelers`), (snapshot) => {
-                const data = snapshot.val();
+            onValue(ref(db, `trips/${currentTripId}/travelers`), (s) => {
+                const data = s.val();
                 travelers = [];
                 const list = document.getElementById('travelerList');
                 const payer = document.getElementById('payerSelect');
-                const checks = document.getElementById('splitCheckboxes');
+                const selector = document.getElementById('splitSelector');
                 
-                list.innerHTML = ''; payer.innerHTML = ''; checks.innerHTML = '';
+                list.innerHTML = ''; payer.innerHTML = '<option disabled selected>Who Paid?</option>'; selector.innerHTML = '';
 
                 if(data) {
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
+                        
                         // Sidebar List
-                        list.innerHTML += `<div class="list-item"><span>${v.name}</span> <i class="fas fa-times" style="cursor:pointer; color:var(--danger)" onclick="deleteItem('travelers/${k}')"></i></div>`;
-                        // Payer Select
+                        list.innerHTML += `<div class="list-item"><span>${v.name}</span> <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i></div>`;
+                        
+                        // Payer Dropdown
                         let opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name;
                         payer.appendChild(opt);
-                        // Checkbox
-                        checks.innerHTML += `
-                            <label class="checkbox-pill">
-                                <input type="checkbox" class="split-checkbox" value="${v.name}" checked>
-                                <span>${v.name}</span>
-                            </label>`;
+
+                        // New Selection UI (Opt-In Logic)
+                        // Note: Input is hidden, Div handles click
+                        const cardId = `card-${v.name}`;
+                        selector.innerHTML += `
+                            <div class="person-card" id="${cardId}" onclick="togglePerson('${cardId}')">
+                                <i class="fas fa-user-circle"></i>
+                                <span style="font-size:0.8rem; font-weight:600;">${v.name}</span>
+                                <input type="checkbox" class="split-checkbox" value="${v.name}">
+                            </div>
+                        `;
                     });
                 }
                 recalc();
             });
 
             // 2. Currencies
-            onValue(ref(db, `trips/${currentTripId}/currencies`), (snapshot) => {
-                const data = snapshot.val();
-                const list = document.getElementById('currencyList');
-                const select = document.getElementById('currencySelect');
-                list.innerHTML = ''; select.innerHTML = '';
+            onValue(ref(db, `trips/${currentTripId}/currencies`), (s) => {
+                const data = s.val();
+                const sel = document.getElementById('currencySelect');
+                const display = document.getElementById('currencyDisplay');
+                sel.innerHTML = ''; display.innerHTML = '';
                 
-                if(data) {
+                // Default
+                if(!data) {
+                    sel.innerHTML = '<option value="USD">USD</option>'; 
+                } else {
                     Object.entries(data).forEach(([k, v]) => {
-                        list.innerHTML += `<span class="badge">${v.code} <span onclick="deleteItem('currencies/${k}')" style="cursor:pointer">&times;</span></span>`;
                         let opt = document.createElement('option'); opt.value = v.code; opt.innerText = v.code;
-                        select.appendChild(opt);
+                        sel.appendChild(opt);
+                        display.innerHTML += `<span style="margin-right:5px; border:1px solid #555; padding:2px 4px; border-radius:4px;">${v.code}</span>`;
                     });
                 }
             });
 
             // 3. Expenses
-            onValue(ref(db, `trips/${currentTripId}/expenses`), (snapshot) => {
-                const data = snapshot.val();
+            onValue(ref(db, `trips/${currentTripId}/expenses`), (s) => {
+                const data = s.val();
                 expenses = [];
                 const list = document.getElementById('expensesList');
                 list.innerHTML = '';
@@ -346,15 +393,29 @@
                     Object.entries(data).reverse().forEach(([k, v]) => {
                         expenses.push(v);
                         total += v.amount;
+                        // Determine Icon based on Category
+                        let icon = 'fas fa-receipt';
+                        if(v.category === 'Food') icon = 'fas fa-utensils';
+                        if(v.category === 'Travel') icon = 'fas fa-taxi';
+                        if(v.category === 'Stay') icon = 'fas fa-bed';
+                        if(v.category === 'Fun') icon = 'fas fa-glass-cheers';
+
                         list.innerHTML += `
                             <div class="list-item">
-                                <div>
-                                    <div style="font-weight:600">${v.desc}</div>
-                                    <div style="font-size:0.8rem; color: var(--text-muted)">${v.payer} paid for ${v.involved.length}</div>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:50%;">
+                                        <i class="${icon}" style="color:var(--primary);"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;">${v.desc} <span class="cat-tag">${v.category || 'Misc'}</span></div>
+                                        <div style="font-size:0.8rem; color:var(--text-muted);">
+                                            ${v.payer} paid for ${v.involved.length} people
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style="text-align:right">
-                                    <div style="font-weight:bold; color: var(--secondary)">${v.currency} ${v.amount}</div>
-                                    <i class="fas fa-trash" style="color:var(--danger); cursor:pointer; font-size:0.8rem;" onclick="deleteItem('expenses/${k}')"></i>
+                                <div style="text-align:right;">
+                                    <div style="font-weight:700;">${v.currency} ${v.amount}</div>
+                                    <i class="fas fa-trash" style="font-size:0.8rem; color:#ef4444; opacity:0.6; cursor:pointer;" onclick="deleteItem('expenses/${k}')"></i>
                                 </div>
                             </div>
                         `;
@@ -362,11 +423,22 @@
                 }
                 document.getElementById('totalCostDisplay').innerText = total.toFixed(2);
                 recalc();
-                updateChart(expenses);
             });
         }
 
-        // --- ACTIONS ---
+        // --- UI HELPERS ---
+        window.togglePerson = (id) => {
+            const card = document.getElementById(id);
+            const checkbox = card.querySelector('input');
+            
+            // Toggle visual state
+            card.classList.toggle('active');
+            
+            // Toggle logical state
+            checkbox.checked = !checkbox.checked;
+        }
+
+        // --- ADD DATA ---
         window.addTraveler = () => {
             const name = document.getElementById('newTraveler').value;
             if(name) {
@@ -374,143 +446,138 @@
                 document.getElementById('newTraveler').value = '';
             }
         }
+
         window.addCurrency = () => {
             const code = document.getElementById('newCurrency').value.toUpperCase();
-            if(code) {
-                push(ref(db, `trips/${currentTripId}/currencies`), { code });
-                document.getElementById('newCurrency').value = '';
-            }
+            if(code) push(ref(db, `trips/${currentTripId}/currencies`), { code });
         }
+
         window.addExpense = () => {
             const desc = document.getElementById('descInput').value;
             const amount = parseFloat(document.getElementById('amountInput').value);
             const currency = document.getElementById('currencySelect').value;
+            const category = document.getElementById('categorySelect').value;
             const payer = document.getElementById('payerSelect').value;
-            const involved = Array.from(document.querySelectorAll('.split-checkbox:checked')).map(cb => cb.value);
+            
+            // Get involved based on CHECKED boxes
+            const involved = [];
+            document.querySelectorAll('.split-checkbox:checked').forEach(cb => involved.push(cb.value));
 
-            if(desc && amount && payer && involved.length > 0) {
-                push(ref(db, `trips/${currentTripId}/expenses`), {
-                    desc, amount, currency, payer, involved, date: Date.now()
-                });
-                document.getElementById('descInput').value = '';
-                document.getElementById('amountInput').value = '';
+            if(!desc || !amount || !payer || payer === "Who Paid?") {
+                alert("Please fill in description, amount, and payer.");
+                return;
             }
-        }
-        window.deleteItem = (path) => {
-            remove(ref(db, `trips/${currentTripId}/${path}`));
-        }
-
-        // --- ALGORITHMS ---
-
-        function recalc() {
-            if(expenses.length === 0 || travelers.length === 0) return;
-
-            // 1. Calculate Raw Net Balances
-            let balances = {};
-            travelers.forEach(t => balances[t] = 0);
-
-            expenses.forEach(ex => {
-                const share = ex.amount / ex.involved.length;
-                // Payer gets + (owed)
-                if(balances[ex.payer] !== undefined) balances[ex.payer] += ex.amount;
-                // Participants get - (owe)
-                ex.involved.forEach(p => {
-                    if(balances[p] !== undefined) balances[p] -= share;
-                });
-            });
-
-            // 2. Simplify Debts (The Algorithm)
-            const transactions = simplifyDebts(balances);
-            renderSettlements(transactions);
-        }
-
-        function simplifyDebts(balances) {
-            // Split into debtors and creditors
-            let debtors = [];
-            let creditors = [];
-
-            Object.entries(balances).forEach(([name, amount]) => {
-                // Use a small epsilon for float comparison to avoid 0.0000001 issues
-                if(amount < -0.01) debtors.push({name, amount});
-                if(amount > 0.01) creditors.push({name, amount});
-            });
-
-            // Sort by magnitude (optional but helps optimization)
-            debtors.sort((a, b) => a.amount - b.amount);
-            creditors.sort((a, b) => b.amount - a.amount);
-
-            let transactions = [];
-
-            // Greedy Matching
-            let i = 0; // debtor index
-            let j = 0; // creditor index
-
-            while (i < debtors.length && j < creditors.length) {
-                let debtor = debtors[i];
-                let creditor = creditors[j];
-
-                // The amount to settle is the minimum of what's owed vs what's owed TO
-                let amount = Math.min(Math.abs(debtor.amount), creditor.amount);
-
-                // Record transaction
-                transactions.push({
-                    from: debtor.name,
-                    to: creditor.name,
-                    amount: amount
-                });
-
-                // Adjust remaining balances
-                debtor.amount += amount;
-                creditor.amount -= amount;
-
-                // If settled, move to next person
-                if (Math.abs(debtor.amount) < 0.01) i++;
-                if (creditor.amount < 0.01) j++;
-            }
-
-            return transactions;
-        }
-
-        function renderSettlements(transactions) {
-            const container = document.getElementById('simplifiedSettlements');
-            container.innerHTML = '';
-
-            if(transactions.length === 0) {
-                container.innerHTML = '<div style="text-align:center; opacity:0.5;">All settled up!</div>';
+            if(involved.length === 0) {
+                alert("Please select at least one person to split with (Tap the cards).");
                 return;
             }
 
-            transactions.forEach(t => {
-                container.innerHTML += `
-                    <div class="settlement-card">
-                        <div style="font-weight:600">${t.from}</div>
-                        <div style="display:flex; flex-direction:column; align-items:center;">
-                            <span style="font-size:0.7rem; color:var(--text-muted);">pays</span>
-                            <i class="fas fa-long-arrow-alt-right arrow-icon"></i>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-weight:600">${t.to}</div>
-                            <div style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</div>
-                        </div>
-                    </div>
-                `;
+            push(ref(db, `trips/${currentTripId}/expenses`), {
+                desc, amount, currency, category, payer, involved, date: Date.now()
             });
+
+            // Reset
+            document.getElementById('descInput').value = '';
+            document.getElementById('amountInput').value = '';
+            // Uncheck all UI cards
+            document.querySelectorAll('.person-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.split-checkbox').forEach(c => c.checked = false);
         }
 
-        function updateChart(data) {
-            const ctx = document.getElementById('miniChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Expenses'],
-                    datasets: [{
-                        data: [100], 
-                        backgroundColor: ['#6366f1'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { cutout: '70%', plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+        window.deleteItem = (path) => { remove(ref(db, `trips/${currentTripId}/${path}`)); }
+
+        // --- MATH & ALGORITHMS ---
+        function recalc() {
+            if(travelers.length === 0) return;
+
+            let balances = {};
+            let totalSpent = {}; // For the new "Top Spenders" feature
+
+            travelers.forEach(t => {
+                balances[t] = 0;
+                totalSpent[t] = 0;
+            });
+
+            expenses.forEach(ex => {
+                const share = ex.amount / ex.involved.length;
+                
+                // 1. Calculate Balances
+                if(balances[ex.payer] !== undefined) balances[ex.payer] += ex.amount;
+                ex.involved.forEach(p => {
+                    if(balances[p] !== undefined) balances[p] -= share;
+                });
+
+                // 2. Calculate Total Spend (Outflow)
+                if(totalSpent[ex.payer] !== undefined) {
+                    totalSpent[ex.payer] += ex.amount;
+                }
+            });
+
+            // Render Settlements
+            renderSettlements(simplifyDebts(balances));
+
+            // Render Top Spenders
+            renderSpending(totalSpent);
+        }
+
+        function renderSpending(spendingObj) {
+            const container = document.getElementById('spendingList');
+            container.innerHTML = '';
+            // Sort by highest spend
+            const sorted = Object.entries(spendingObj).sort((a,b) => b[1] - a[1]);
+            
+            sorted.forEach(([name, amount]) => {
+                if(amount > 0) {
+                    container.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
+                            <span>${name}</span>
+                            <span style="font-weight:bold; color:var(--text);">${amount.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            });
+            if(container.innerHTML === '') container.innerHTML = '<span style="color:gray; font-size:0.8rem">No data yet.</span>';
+        }
+
+        function simplifyDebts(balances) {
+            let debtors = [], creditors = [];
+            Object.entries(balances).forEach(([n, a]) => {
+                if(a < -0.01) debtors.push({name:n, amount:a});
+                if(a > 0.01) creditors.push({name:n, amount:a});
+            });
+            
+            // Optimization
+            debtors.sort((a,b) => a.amount - b.amount);
+            creditors.sort((a,b) => b.amount - a.amount);
+
+            let transactions = [];
+            let i=0, j=0;
+            while(i < debtors.length && j < creditors.length) {
+                let d = debtors[i], c = creditors[j];
+                let amt = Math.min(Math.abs(d.amount), c.amount);
+                
+                transactions.push({ from: d.name, to: c.name, amount: amt });
+                
+                d.amount += amt; c.amount -= amt;
+                if(Math.abs(d.amount) < 0.01) i++;
+                if(c.amount < 0.01) j++;
+            }
+            return transactions;
+        }
+
+        function renderSettlements(txs) {
+            const div = document.getElementById('simplifiedSettlements');
+            div.innerHTML = '';
+            if(txs.length === 0) {
+                div.innerHTML = '<div style="text-align:center; color:var(--success);"><i class="fas fa-check-circle"></i> All Settle!</div>';
+                return;
+            }
+            txs.forEach(t => {
+                div.innerHTML += `
+                    <div class="settle-row">
+                        <span><b>${t.from}</b> pays <b>${t.to}</b></span>
+                        <span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span>
+                    </div>`;
             });
         }
 
