@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Smart Expense Splitter</title>
+    <title>Paise de Bro | Secure</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,8 +11,8 @@
 
     <style>
         :root {
-            --primary: #8b5cf6; /* Violet */
-            --accent: #f43f5e;  /* Rose */
+            --primary: #8b5cf6;
+            --accent: #f43f5e;
             --bg: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.6);
             --text: #f8fafc;
@@ -24,7 +24,6 @@
 
         body {
             background-color: var(--bg);
-            /* Dynamic animated gradient background */
             background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
             color: var(--text);
             min-height: 100vh;
@@ -35,7 +34,7 @@
         .container { max-width: 1200px; margin: 0 auto; }
         .hidden { display: none !important; }
 
-        /* --- GLASSCARDS --- */
+        /* --- CARDS --- */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -45,213 +44,192 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-            transition: 0.3s ease;
         }
 
-        h1 { 
-            font-weight: 800; 
-            background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%); 
-            -webkit-background-clip: text; 
-            color: transparent; 
-            margin-bottom: 0.5rem;
+        /* --- LOGIN SCREEN --- */
+        .login-container {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
-        h3 { font-weight: 600; letter-spacing: 0.5px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        
+        .google-btn {
+            background: white; color: #333; display: flex; align-items: center; gap: 10px;
+            padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;
+            transition: 0.2s; border: none; font-size: 1rem;
+        }
+        .google-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
 
-        /* --- INPUTS --- */
+        /* --- USER HEADER --- */
+        .user-header {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.3); padding: 5px 15px 5px 5px;
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); }
+        .logout-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; }
+        .logout-btn:hover { color: var(--accent); }
+
+        /* --- TYPOGRAPHY & BUTTONS --- */
+        h1 { font-weight: 800; background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%); -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem; }
+        h3 { font-weight: 600; letter-spacing: 0.5px; margin-bottom: 1rem; }
+        
         input, select {
-            width: 100%; 
-            background: rgba(15, 23, 42, 0.6); 
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem; 
-            border-radius: 12px; 
-            color: white; 
-            outline: none; 
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
+            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem; border-radius: 12px; color: white; outline: none; margin-bottom: 12px;
         }
         input:focus, select:focus { border-color: var(--primary); }
 
-        /* --- BUTTONS --- */
-        button {
-            width: 100%; padding: 1rem; border: none; border-radius: 12px; 
-            font-weight: 700; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        button.btn-primary {
+            width: 100%; padding: 1rem; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(90deg, var(--primary), var(--accent)); color: white;
             text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
         }
-        .btn-primary { 
-            background: linear-gradient(90deg, var(--primary), var(--accent)); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-        }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-danger { background: rgba(244, 63, 94, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+        button.btn-danger { width: auto; padding: 0.5rem 1rem; background: rgba(244, 63, 94, 0.15); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; }
 
-        /* --- UNIQUE SELECTION GRID (THE NEW UI) --- */
-        .selection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
+        /* --- SQUAD SELECTION --- */
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .person-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            user-select: none;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; user-select: none;
         }
-
-        .person-card:hover { background: rgba(255,255,255,0.08); }
-
-        /* Selected State */
-        .person-card.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
-            transform: translateY(-2px);
-        }
-        
-        .person-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; color: var(--text-muted); }
-        .person-card.active i { color: white; }
-        .person-card input { display: none; } /* Hide actual checkbox */
+        .person-card.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); transform: translateY(-2px); }
+        .person-card input { display: none; }
+        .person-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
 
         /* --- LAYOUT --- */
         .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
         @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
-
-        .list-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
-        }
-
-        /* --- CATEGORY TAGS --- */
-        .cat-tag {
-            font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; 
-            background: rgba(255,255,255,0.1); text-transform: uppercase; margin-left: 8px;
-        }
-        
-        /* --- SETTLEMENTS --- */
-        .settle-row {
-            background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success);
-            padding: 10px; margin-bottom: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .cat-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); text-transform: uppercase; margin-left: 8px; }
+        .settle-row { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); padding: 10px; margin-bottom: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="loginView" class="hidden login-container">
+        <h1 style="font-size: 4rem; margin-bottom: 10px;">Paise de Bro</h1>
+        <p style="color: var(--text-muted); margin-bottom: 40px;">Secure Expenses for the Squad.</p>
         
-        <div id="tripSelectorView">
-            <div style="text-align: center; margin-top: 10vh; margin-bottom: 3rem;">
-                <h1 style="font-size: 4rem;">Paise de Bro</h1>
-                <p style="color: var(--text-muted); font-size: 1.2rem;">Select a trip. Split the bill. Keep friendships.</p>
-            </div>
+        <button class="google-btn" onclick="signIn()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+            Sign in with Google
+        </button>
+    </div>
 
-            <div class="card" style="max-width: 400px; margin: 0 auto;">
-                <input type="text" id="newTripName" placeholder="Where are you going? (e.g. Goa 2025)">
-                <button class="btn-primary" onclick="createTrip()">Start New Trip</button>
-            </div>
-
-            <div style="text-align: center; margin-top: 3rem;">
-                <h3 style="justify-content: center; color: var(--text-muted);">Your Trips</h3>
-                <div id="tripsList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;"></div>
+    <div id="appContainer" class="hidden">
+        
+        <div class="user-header">
+            <img id="userAvatar" class="user-avatar" src="" alt="User">
+            <div style="display:flex; flex-direction:column;">
+                <span id="userName" style="font-size:0.8rem; font-weight:600;">User</span>
+                <button class="logout-btn" onclick="logOut()">Sign Out</button>
             </div>
         </div>
 
-        <div id="dashboardView" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <div>
-                    <button onclick="goHome()" style="width: auto; background: transparent; color: var(--text-muted); padding: 0;">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </button>
-                    <h1 id="currentTripTitle" style="margin-top: 10px;">Goa 2025</h1>
+        <div class="container">
+            
+            <div id="tripSelectorView">
+                <div style="text-align: center; margin-top: 10vh; margin-bottom: 3rem;">
+                    <h1 style="font-size: 4rem;">Paise de Bro</h1>
+                    <p style="color: var(--text-muted); font-size: 1.2rem;">Select a trip. Split the bill. Keep friendships.</p>
                 </div>
-                <button class="btn-danger" style="width: auto; padding: 0.5rem 1rem;" onclick="deleteCurrentTrip()">
-                    <i class="fas fa-trash"></i>
-                </button>
+
+                <div class="card" style="max-width: 400px; margin: 0 auto;">
+                    <input type="text" id="newTripName" placeholder="Trip Name (e.g. Manali 2025)">
+                    <button class="btn-primary" onclick="createTrip()">Start New Trip</button>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <h3 style="justify-content: center; color: var(--text-muted);">Your Trips</h3>
+                    <div id="tripsList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;"></div>
+                </div>
             </div>
 
-            <div class="grid-layout">
-                <aside>
-                    <div class="card">
-                        <h3><i class="fas fa-user-plus"></i> The Squad</h3>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="newTraveler" placeholder="Name">
-                            <button class="btn-primary" style="width: auto;" onclick="addTraveler()">Add</button>
+            <div id="dashboardView" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <button onclick="goHome()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer;">
+                            <i class="fas fa-arrow-left"></i> Back to Trips
+                        </button>
+                        <h1 id="currentTripTitle" style="margin-top: 10px;">Trip Name</h1>
+                    </div>
+                    <button class="btn-danger" onclick="deleteCurrentTrip()"><i class="fas fa-trash"></i></button>
+                </div>
+
+                <div class="grid-layout">
+                    <aside>
+                        <div class="card">
+                            <h3><i class="fas fa-user-plus"></i> The Squad</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="newTraveler" placeholder="Name">
+                                <button class="btn-primary" style="width: auto;" onclick="addTraveler()">Add</button>
+                            </div>
+                            <div id="travelerList" style="margin-top: 10px;"></div>
                         </div>
-                        <div id="travelerList" style="margin-top: 10px;"></div>
-                    </div>
 
-                    <div class="card">
-                        <h3><i class="fas fa-wallet"></i> Top Spenders</h3>
-                        <div id="spendingList">
-                            <p style="font-size: 0.8rem; color: var(--text-muted);">Add expenses to see stats.</p>
+                        <div class="card">
+                            <h3><i class="fas fa-wallet"></i> Top Spenders</h3>
+                            <div id="spendingList"><p style="font-size:0.8rem; color:var(--text-muted)">No Data</p></div>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <h3><i class="fas fa-handshake"></i> Settlements</h3>
-                        <div id="simplifiedSettlements"></div>
-                    </div>
-
-                    <div class="card" style="opacity: 0.7;">
-                        <h3><i class="fas fa-cog"></i> Settings</h3>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="newCurrency" placeholder="Add Currency (EUR)">
-                            <button onclick="addCurrency()" style="width: auto;">+</button>
+                        <div class="card">
+                            <h3><i class="fas fa-handshake"></i> Settlements</h3>
+                            <div id="simplifiedSettlements"></div>
                         </div>
-                        <div id="currencyDisplay" style="margin-top: 5px; font-size: 0.8rem; color: var(--text-muted);"></div>
-                    </div>
-                </aside>
-
-                <main>
-                    <div class="card" style="border: 1px solid var(--primary);">
-                        <h3 style="color: var(--primary);"><i class="fas fa-receipt"></i> Add New Expense</h3>
                         
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
-                            <input type="text" id="descInput" placeholder="What was it? (e.g. Dinner)">
-                            <input type="number" id="amountInput" placeholder="0.00">
-                        </div>
+                        <div class="card" style="opacity:0.7">
+                            <h3>Settings</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="newCurrency" placeholder="Add Currency">
+                                <button onclick="addCurrency()" style="width:auto; border:none; border-radius:8px; cursor:pointer;">+</button>
+                            </div>
+                             <div id="currencyDisplay" style="margin-top:5px; font-size:0.8rem; color:var(--text-muted)"></div>
+                         </div>
+                    </aside>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                            <select id="currencySelect"></select>
-                            <select id="categorySelect">
-                                <option value="Food">🍔 Food</option>
-                                <option value="Travel">🚕 Travel</option>
-                                <option value="Stay">🏨 Stay</option>
-                                <option value="Fun">🍺 Fun</option>
-                                <option value="Groceries">🍎 Groceries</option>
-                                <option value="Misc">📦 Misc</option>
-                            </select>
-                            <select id="payerSelect">
-                                <option disabled selected>Who Paid?</option>
-                            </select>
-                        </div>
-
-                        <p style="margin: 15px 0 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
-                            Split with whom? (Select to include)
-                        </p>
-                        <div id="splitSelector" class="selection-grid">
+                    <main>
+                        <div class="card" style="border: 1px solid var(--primary);">
+                            <h3 style="color: var(--primary);"><i class="fas fa-receipt"></i> Add New Expense</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                                <input type="text" id="descInput" placeholder="What was it?">
+                                <input type="number" id="amountInput" placeholder="0.00">
                             </div>
 
-                        <button class="btn-primary" onclick="addExpense()">Add Expense</button>
-                    </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <select id="currencySelect"></select>
+                                <select id="categorySelect">
+                                    <option value="Food">🍔 Food</option>
+                                    <option value="Travel">🚕 Travel</option>
+                                    <option value="Stay">🏨 Stay</option>
+                                    <option value="Fun">🍺 Fun</option>
+                                    <option value="Misc">📦 Misc</option>
+                                </select>
+                                <select id="payerSelect"><option disabled selected>Who Paid?</option></select>
+                            </div>
 
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                            <h3>Recent Activity</h3>
-                            <h2 id="totalCostDisplay" style="color:white;">0.00</h2>
+                            <p style="margin: 15px 0 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+                                Split with whom? (Select to include)
+                            </p>
+                            <div id="splitSelector" class="selection-grid"></div>
+
+                            <button class="btn-primary" onclick="addExpense()">Add Expense</button>
                         </div>
-                        <div id="expensesList"></div>
-                    </div>
-                </main>
+
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                                <h3>Recent Activity</h3>
+                                <h2 id="totalCostDisplay" style="color:white;">0.00</h2>
+                            </div>
+                            <div id="expensesList"></div>
+                        </div>
+                    </main>
+                </div>
             </div>
         </div>
     </div>
@@ -259,8 +237,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        // 1. IMPORT AUTH PACKAGES
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-        // 🔴🔴 FILL THIS IN WITH YOUR KEYS 🔴🔴
+        // 🔴🔴 FILL THIS IN (Must match your Firebase Console) 🔴🔴
         const firebaseConfig = {
             apiKey: "AIzaSyB1L79JF2HhJA_s7r_p3jsdMLi0tAYsTcc", 
             authDomain: "project008-d245d.firebaseapp.com",
@@ -268,25 +248,84 @@
             projectId: "project008-d245d",
             storageBucket: "project008-d245d.appspot.com",
             messagingSenderId: "756575861094",
-            appId: "1:756575861094:web:4d6c2db550cc016f3eb0a7"
+            appId: "1:756575861094:web:70a4967c516cbc3a3eb0a7"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app); // Initialize Auth
+        const provider = new GoogleAuthProvider();
 
-        // State variables
+        let currentUser = null;
         let currentTripId = null;
         let travelers = [];
         let expenses = [];
-        let currencies = [];
 
-        // --- NAVIGATION & SETUP ---
-        
+        // --- AUTHENTICATION LOGIC ---
+
+        // Listen for login state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                currentUser = user;
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                
+                // Update User Header
+                document.getElementById('userAvatar').src = user.photoURL;
+                document.getElementById('userName').innerText = user.displayName.split(' ')[0]; // First name
+                
+                // Load Trips
+                loadAllTrips(); 
+            } else {
+                // User is signed out
+                currentUser = null;
+                document.getElementById('appContainer').classList.add('hidden');
+                document.getElementById('loginView').classList.remove('hidden');
+            }
+        });
+
+        window.signIn = () => {
+            signInWithPopup(auth, provider)
+                .then((result) => { console.log("Logged in:", result.user.email); })
+                .catch((error) => { alert("Error signing in: " + error.message); });
+        };
+
+        window.logOut = () => {
+            signOut(auth).then(() => { location.reload(); });
+        }
+
+        // --- DATABASE LOGIC (Wrapped to ensure User exists) ---
+
+        function loadAllTrips() {
+            onValue(ref(db, 'trips'), (snapshot) => {
+                const data = snapshot.val();
+                const list = document.getElementById('tripsList');
+                list.innerHTML = '';
+                if(data) {
+                    Object.entries(data).forEach(([key, val]) => {
+                        list.innerHTML += `
+                            <div onclick="loadTrip('${key}', '${val.meta.name}')" 
+                                 style="background:rgba(255,255,255,0.05); padding:1rem 2rem; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
+                                <h4 style="margin:0;">${val.meta.name}</h4>
+                            </div>`;
+                    });
+                }
+            });
+        }
+
         window.createTrip = () => {
+            if(!currentUser) return;
             const name = document.getElementById('newTripName').value;
             if(!name) return;
             const newRef = push(ref(db, 'trips'));
-            set(newRef, { meta: { name: name, created: Date.now() } });
+            set(newRef, { 
+                meta: { 
+                    name: name, 
+                    createdBy: currentUser.email, // Tracking who made it
+                    created: Date.now() 
+                } 
+            });
             document.getElementById('newTripName').value = '';
         }
 
@@ -295,10 +334,13 @@
             document.getElementById('tripSelectorView').classList.add('hidden');
             document.getElementById('dashboardView').classList.remove('hidden');
             document.getElementById('currentTripTitle').innerText = name;
-            startListeners();
+            startTripListeners();
         }
 
-        window.goHome = () => { location.reload(); }
+        window.goHome = () => {
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('tripSelectorView').classList.remove('hidden');
+        }
 
         window.deleteCurrentTrip = () => {
             if(confirm("Delete this trip forever?")) {
@@ -307,25 +349,7 @@
             }
         }
 
-        // --- GLOBAL LISTENER (LANDING PAGE) ---
-        onValue(ref(db, 'trips'), (snapshot) => {
-            const data = snapshot.val();
-            const list = document.getElementById('tripsList');
-            list.innerHTML = '';
-            if(data) {
-                Object.entries(data).forEach(([key, val]) => {
-                    list.innerHTML += `
-                        <div onclick="loadTrip('${key}', '${val.meta.name}')" 
-                             style="background:rgba(255,255,255,0.05); padding:1rem 2rem; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
-                            <h4 style="margin:0;">${val.meta.name}</h4>
-                        </div>`;
-                });
-            }
-        });
-
-        // --- TRIP LISTENERS ---
-
-        function startListeners() {
+        function startTripListeners() {
             // 1. Travelers
             onValue(ref(db, `trips/${currentTripId}/travelers`), (s) => {
                 const data = s.val();
@@ -339,24 +363,17 @@
                 if(data) {
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
-                        
-                        // Sidebar List
                         list.innerHTML += `<div class="list-item"><span>${v.name}</span> <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i></div>`;
-                        
-                        // Payer Dropdown
                         let opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name;
                         payer.appendChild(opt);
 
-                        // New Selection UI (Opt-In Logic)
-                        // Note: Input is hidden, Div handles click
                         const cardId = `card-${v.name}`;
                         selector.innerHTML += `
                             <div class="person-card" id="${cardId}" onclick="togglePerson('${cardId}')">
                                 <i class="fas fa-user-circle"></i>
                                 <span style="font-size:0.8rem; font-weight:600;">${v.name}</span>
                                 <input type="checkbox" class="split-checkbox" value="${v.name}">
-                            </div>
-                        `;
+                            </div>`;
                     });
                 }
                 recalc();
@@ -369,10 +386,8 @@
                 const display = document.getElementById('currencyDisplay');
                 sel.innerHTML = ''; display.innerHTML = '';
                 
-                // Default
-                if(!data) {
-                    sel.innerHTML = '<option value="USD">USD</option>'; 
-                } else {
+                if(!data) { sel.innerHTML = '<option value="USD">USD</option>'; } 
+                else {
                     Object.entries(data).forEach(([k, v]) => {
                         let opt = document.createElement('option'); opt.value = v.code; opt.innerText = v.code;
                         sel.appendChild(opt);
@@ -393,7 +408,6 @@
                     Object.entries(data).reverse().forEach(([k, v]) => {
                         expenses.push(v);
                         total += v.amount;
-                        // Determine Icon based on Category
                         let icon = 'fas fa-receipt';
                         if(v.category === 'Food') icon = 'fas fa-utensils';
                         if(v.category === 'Travel') icon = 'fas fa-taxi';
@@ -417,8 +431,7 @@
                                     <div style="font-weight:700;">${v.currency} ${v.amount}</div>
                                     <i class="fas fa-trash" style="font-size:0.8rem; color:#ef4444; opacity:0.6; cursor:pointer;" onclick="deleteItem('expenses/${k}')"></i>
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                     });
                 }
                 document.getElementById('totalCostDisplay').innerText = total.toFixed(2);
@@ -426,117 +439,65 @@
             });
         }
 
-        // --- UI HELPERS ---
+        // --- UI HELPERS & ACTIONS ---
         window.togglePerson = (id) => {
             const card = document.getElementById(id);
             const checkbox = card.querySelector('input');
-            
-            // Toggle visual state
             card.classList.toggle('active');
-            
-            // Toggle logical state
             checkbox.checked = !checkbox.checked;
         }
 
-        // --- ADD DATA ---
         window.addTraveler = () => {
             const name = document.getElementById('newTraveler').value;
-            if(name) {
-                push(ref(db, `trips/${currentTripId}/travelers`), { name });
-                document.getElementById('newTraveler').value = '';
-            }
+            if(name) { push(ref(db, `trips/${currentTripId}/travelers`), { name }); document.getElementById('newTraveler').value = ''; }
         }
-
         window.addCurrency = () => {
             const code = document.getElementById('newCurrency').value.toUpperCase();
             if(code) push(ref(db, `trips/${currentTripId}/currencies`), { code });
         }
-
         window.addExpense = () => {
             const desc = document.getElementById('descInput').value;
             const amount = parseFloat(document.getElementById('amountInput').value);
             const currency = document.getElementById('currencySelect').value;
             const category = document.getElementById('categorySelect').value;
             const payer = document.getElementById('payerSelect').value;
-            
-            // Get involved based on CHECKED boxes
             const involved = [];
             document.querySelectorAll('.split-checkbox:checked').forEach(cb => involved.push(cb.value));
 
-            if(!desc || !amount || !payer || payer === "Who Paid?") {
-                alert("Please fill in description, amount, and payer.");
-                return;
-            }
-            if(involved.length === 0) {
-                alert("Please select at least one person to split with (Tap the cards).");
-                return;
+            if(!desc || !amount || !payer || payer === "Who Paid?" || involved.length === 0) {
+                alert("Please fill all fields and select split participants."); return;
             }
 
             push(ref(db, `trips/${currentTripId}/expenses`), {
-                desc, amount, currency, category, payer, involved, date: Date.now()
+                desc, amount, currency, category, payer, involved, 
+                addedBy: currentUser.email, // Tracking
+                date: Date.now()
             });
 
-            // Reset
             document.getElementById('descInput').value = '';
             document.getElementById('amountInput').value = '';
-            // Uncheck all UI cards
             document.querySelectorAll('.person-card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.split-checkbox').forEach(c => c.checked = false);
         }
 
         window.deleteItem = (path) => { remove(ref(db, `trips/${currentTripId}/${path}`)); }
 
-        // --- MATH & ALGORITHMS ---
+        // --- MATH ---
         function recalc() {
             if(travelers.length === 0) return;
-
             let balances = {};
-            let totalSpent = {}; // For the new "Top Spenders" feature
-
-            travelers.forEach(t => {
-                balances[t] = 0;
-                totalSpent[t] = 0;
-            });
+            let totalSpent = {};
+            travelers.forEach(t => { balances[t] = 0; totalSpent[t] = 0; });
 
             expenses.forEach(ex => {
                 const share = ex.amount / ex.involved.length;
-                
-                // 1. Calculate Balances
                 if(balances[ex.payer] !== undefined) balances[ex.payer] += ex.amount;
-                ex.involved.forEach(p => {
-                    if(balances[p] !== undefined) balances[p] -= share;
-                });
-
-                // 2. Calculate Total Spend (Outflow)
-                if(totalSpent[ex.payer] !== undefined) {
-                    totalSpent[ex.payer] += ex.amount;
-                }
+                if(totalSpent[ex.payer] !== undefined) totalSpent[ex.payer] += ex.amount;
+                ex.involved.forEach(p => { if(balances[p] !== undefined) balances[p] -= share; });
             });
 
-            // Render Settlements
             renderSettlements(simplifyDebts(balances));
-
-            // Render Top Spenders
             renderSpending(totalSpent);
-        }
-
-        function renderSpending(spendingObj) {
-            const container = document.getElementById('spendingList');
-            container.innerHTML = '';
-            // Sort by highest spend
-            const sorted = Object.entries(spendingObj).sort((a,b) => b[1] - a[1]);
-            
-            sorted.forEach(([name, amount]) => {
-                if(amount > 0) {
-                    container.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;">
-                            <span>${name}</span>
-                            <span style="font-weight:bold; color:var(--text);">${amount.toFixed(2)}</span>
-                        </div>
-                    `;
-                }
-            });
-            if(container.innerHTML === '') container.innerHTML = '<span style="color:gray; font-size:0.8rem">No data yet.</span>';
         }
 
         function simplifyDebts(balances) {
@@ -545,8 +506,6 @@
                 if(a < -0.01) debtors.push({name:n, amount:a});
                 if(a > 0.01) creditors.push({name:n, amount:a});
             });
-            
-            // Optimization
             debtors.sort((a,b) => a.amount - b.amount);
             creditors.sort((a,b) => b.amount - a.amount);
 
@@ -555,9 +514,7 @@
             while(i < debtors.length && j < creditors.length) {
                 let d = debtors[i], c = creditors[j];
                 let amt = Math.min(Math.abs(d.amount), c.amount);
-                
                 transactions.push({ from: d.name, to: c.name, amount: amt });
-                
                 d.amount += amt; c.amount -= amt;
                 if(Math.abs(d.amount) < 0.01) i++;
                 if(c.amount < 0.01) j++;
@@ -568,17 +525,21 @@
         function renderSettlements(txs) {
             const div = document.getElementById('simplifiedSettlements');
             div.innerHTML = '';
-            if(txs.length === 0) {
-                div.innerHTML = '<div style="text-align:center; color:var(--success);"><i class="fas fa-check-circle"></i> All Settle!</div>';
-                return;
-            }
+            if(txs.length === 0) { div.innerHTML = '<div style="text-align:center; color:var(--success);">All Settle!</div>'; return; }
             txs.forEach(t => {
-                div.innerHTML += `
-                    <div class="settle-row">
-                        <span><b>${t.from}</b> pays <b>${t.to}</b></span>
-                        <span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span>
-                    </div>`;
+                div.innerHTML += `<div class="settle-row"><span><b>${t.from}</b> pays <b>${t.to}</b></span><span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span></div>`;
             });
+        }
+        function renderSpending(spendingObj) {
+            const container = document.getElementById('spendingList');
+            container.innerHTML = '';
+            const sorted = Object.entries(spendingObj).sort((a,b) => b[1] - a[1]);
+            sorted.forEach(([name, amount]) => {
+                if(amount > 0) {
+                    container.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;"><span>${name}</span><span style="font-weight:bold;">${amount.toFixed(2)}</span></div>`;
+                }
+            });
+            if(container.innerHTML === '') container.innerHTML = '<span style="color:gray; font-size:0.8rem">No data yet.</span>';
         }
 
     </script>
