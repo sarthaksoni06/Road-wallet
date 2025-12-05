@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Secure</title>
+    <title>Paise de Bro | Split the Bill.</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
             --primary: #8b5cf6;
             --accent: #f43f5e;
             --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.6);
+            --card-bg: rgba(30, 41, 59, 0.75);
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #10b981;
@@ -59,9 +59,15 @@
         .google-btn {
             background: white; color: #333; display: flex; align-items: center; gap: 10px;
             padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;
-            transition: 0.2s; border: none; font-size: 1rem;
+            transition: 0.2s; border: none; font-size: 1rem; z-index: 10;
         }
         .google-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        #statusMessage {
+            margin-top: 20px; padding: 15px; border-radius: 8px;
+            background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444;
+            color: #fca5a5; max-width: 400px; font-size: 0.9rem; display: none;
+        }
 
         /* --- USER HEADER --- */
         .user-header {
@@ -69,6 +75,7 @@
             display: flex; align-items: center; gap: 10px;
             background: rgba(0,0,0,0.3); padding: 5px 15px 5px 5px;
             border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
         }
         .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); }
         .logout-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; }
@@ -89,9 +96,10 @@
             background: linear-gradient(90deg, var(--primary), var(--accent)); color: white;
             text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
         }
-        button.btn-danger { width: auto; padding: 0.5rem 1rem; background: rgba(244, 63, 94, 0.15); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; }
+        button.btn-danger { width: auto; padding: 0.7rem; background: rgba(244, 63, 94, 0.2); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition:0.2s; }
+        button.btn-danger:hover { background: var(--accent); color: white; }
 
-        /* --- SQUAD SELECTION --- */
+        /* --- UI ELEMENTS --- */
         .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
         .person-card {
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
@@ -101,12 +109,21 @@
         .person-card input { display: none; }
         .person-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
 
-        /* --- LAYOUT --- */
         .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
         @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .cat-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); text-transform: uppercase; margin-left: 8px; }
         .settle-row { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); padding: 10px; margin-bottom: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
+    
+        .trip-card {
+            background: rgba(255,255,255,0.05); padding: 1rem 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; transition: 0.2s; min-width: 200px; text-align: center;
+        }
+        .trip-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+        
+        .admin-badge {
+            background: var(--accent); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -115,10 +132,12 @@
         <h1 style="font-size: 4rem; margin-bottom: 10px;">Paise de Bro</h1>
         <p style="color: var(--text-muted); margin-bottom: 40px;">Secure Expenses for the Squad.</p>
         
-        <button class="google-btn" onclick="signIn()">
+        <button id="googleLoginBtn" class="google-btn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
             Sign in with Google
         </button>
+
+        <div id="statusMessage"></div>
     </div>
 
     <div id="appContainer" class="hidden">
@@ -136,7 +155,7 @@
             <div id="tripSelectorView">
                 <div style="text-align: center; margin-top: 10vh; margin-bottom: 3rem;">
                     <h1 style="font-size: 4rem;">Paise de Bro</h1>
-                    <p style="color: var(--text-muted); font-size: 1.2rem;">Select a trip. Split the bill. Keep friendships.</p>
+                    <p style="color: var(--text-muted); font-size: 1.2rem;">Your Private Trips Dashboard</p>
                 </div>
 
                 <div class="card" style="max-width: 400px; margin: 0 auto;">
@@ -145,7 +164,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 3rem;">
-                    <h3 style="justify-content: center; color: var(--text-muted);">Your Trips</h3>
+                    <h3 style="justify-content: center; color: var(--text-muted);">Trips You Can Access</h3>
                     <div id="tripsList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;"></div>
                 </div>
             </div>
@@ -158,38 +177,49 @@
                         </button>
                         <h1 id="currentTripTitle" style="margin-top: 10px;">Trip Name</h1>
                     </div>
-                    <button class="btn-danger" onclick="deleteCurrentTrip()"><i class="fas fa-trash"></i></button>
                 </div>
 
                 <div class="grid-layout">
                     <aside>
-                        <div class="card">
-                            <h3><i class="fas fa-user-plus"></i> The Squad</h3>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="newTraveler" placeholder="Name">
-                                <button class="btn-primary" style="width: auto;" onclick="addTraveler()">Add</button>
-                            </div>
-                            <div id="travelerList" style="margin-top: 10px;"></div>
-                        </div>
-
-                        <div class="card">
-                            <h3><i class="fas fa-wallet"></i> Top Spenders</h3>
-                            <div id="spendingList"><p style="font-size:0.8rem; color:var(--text-muted)">No Data</p></div>
+                        
+                        <div class="card" style="border: 1px solid var(--primary);">
+                            <h3><i class="fas fa-user-plus"></i> Add Member</h3>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
+                                This adds them to the split list AND grants them access to view the trip.
+                            </p>
+                            
+                            <input type="text" id="newMemberName" placeholder="Name (e.g. Rahul)">
+                            <input type="email" id="newMemberEmail" placeholder="Email (rahul@gmail.com)">
+                            
+                            <button class="btn-primary" onclick="addMember()">Add to Squad</button>
+                            
+                            <div id="travelerList" style="margin-top: 15px;"></div>
                         </div>
 
                         <div class="card">
                             <h3><i class="fas fa-handshake"></i> Settlements</h3>
                             <div id="simplifiedSettlements"></div>
                         </div>
-                        
-                        <div class="card" style="opacity:0.7">
-                            <h3>Settings</h3>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="newCurrency" placeholder="Add Currency">
-                                <button onclick="addCurrency()" style="width:auto; border:none; border-radius:8px; cursor:pointer;">+</button>
+
+                         <div class="card" style="opacity:0.8; border: 1px solid rgba(255,255,255,0.1);">
+                            <h3><i class="fas fa-cog"></i> Settings</h3>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="font-size:0.8rem;">Add Currency</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="newCurrency" placeholder="Code (e.g. GBP)" style="margin-bottom:0;">
+                                    <button onclick="addCurrency()" style="width:auto; padding:0.5rem 1rem;">+</button>
+                                </div>
+                                <div id="currencyDisplay" style="margin-top:5px; font-size:0.8rem; color:var(--text-muted)"></div>
                             </div>
-                             <div id="currencyDisplay" style="margin-top:5px; font-size:0.8rem; color:var(--text-muted)"></div>
+
+                            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                                <button class="btn-danger" onclick="deleteCurrentTrip()">
+                                    <i class="fas fa-trash"></i> Delete Entire Trip
+                                </button>
+                            </div>
                          </div>
+
                     </aside>
 
                     <main>
@@ -237,10 +267,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-        // 1. IMPORT AUTH PACKAGES
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-        // 🔴🔴 FILL THIS IN (Must match your Firebase Console) 🔴🔴
+        // 🔴 Keys Pre-Filled 🔴
         const firebaseConfig = {
             apiKey: "AIzaSyB1L79JF2HhJA_s7r_p3jsdMLi0tAYsTcc", 
             authDomain: "project008-d245d.firebaseapp.com",
@@ -253,64 +282,80 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const auth = getAuth(app); // Initialize Auth
+        const auth = getAuth(app); 
         const provider = new GoogleAuthProvider();
+
+        // 👑 SUPER ADMIN EMAIL
+        const ADMIN_EMAIL = "sarthaksoni06@gmail.com";
 
         let currentUser = null;
         let currentTripId = null;
         let travelers = [];
         let expenses = [];
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTHENTICATION ---
+        function showStatus(msg) {
+            const el = document.getElementById('statusMessage');
+            el.style.display = 'block';
+            el.innerHTML = `<strong>Status:</strong> ${msg}`;
+        }
 
-        // Listen for login state changes
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in
                 currentUser = user;
                 document.getElementById('loginView').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
-                
-                // Update User Header
                 document.getElementById('userAvatar').src = user.photoURL;
-                document.getElementById('userName').innerText = user.displayName.split(' ')[0]; // First name
+                document.getElementById('userName').innerText = user.displayName ? user.displayName.split(' ')[0] : 'User';
                 
-                // Load Trips
-                loadAllTrips(); 
+                // Show Admin Badge
+                if(user.email === ADMIN_EMAIL) {
+                    document.getElementById('userName').innerHTML += ' <span class="admin-badge">Admin</span>';
+                }
+
+                loadMyTrips(); 
             } else {
-                // User is signed out
                 currentUser = null;
                 document.getElementById('appContainer').classList.add('hidden');
                 document.getElementById('loginView').classList.remove('hidden');
             }
         });
 
-        window.signIn = () => {
-            signInWithPopup(auth, provider)
-                .then((result) => { console.log("Logged in:", result.user.email); })
-                .catch((error) => { alert("Error signing in: " + error.message); });
-        };
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            showStatus("Connecting...");
+            signInWithPopup(auth, provider).catch((error) => {
+                showStatus(error.code === 'auth/unauthorized-domain' ? "DOMAIN ERROR: Whitelist this URL in Firebase Console." : error.message);
+            });
+        });
 
-        window.logOut = () => {
-            signOut(auth).then(() => { location.reload(); });
-        }
+        window.logOut = () => { signOut(auth).then(() => location.reload()); }
 
-        // --- DATABASE LOGIC (Wrapped to ensure User exists) ---
+        // --- TRIPS LOGIC ---
 
-        function loadAllTrips() {
+        function loadMyTrips() {
             onValue(ref(db, 'trips'), (snapshot) => {
                 const data = snapshot.val();
                 const list = document.getElementById('tripsList');
                 list.innerHTML = '';
+                
                 if(data) {
                     Object.entries(data).forEach(([key, val]) => {
-                        list.innerHTML += `
-                            <div onclick="loadTrip('${key}', '${val.meta.name}')" 
-                                 style="background:rgba(255,255,255,0.05); padding:1rem 2rem; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;">
-                                <h4 style="margin:0;">${val.meta.name}</h4>
-                            </div>`;
+                        const accessList = val.accessList || {};
+                        const allowedEmails = Object.values(accessList);
+                        
+                        // 🔒 Logic: Show if I am in Access List OR I am the Admin
+                        if (allowedEmails.includes(currentUser.email) || currentUser.email === ADMIN_EMAIL) {
+                            list.innerHTML += `
+                                <div class="trip-card" onclick="loadTrip('${key}', '${val.meta.name}')">
+                                    <h4 style="margin:0;">${val.meta.name}</h4>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); margin-top:5px;">
+                                        ${allowedEmails.length} Member(s)
+                                    </div>
+                                </div>`;
+                        }
                     });
                 }
+                if(list.innerHTML === '') list.innerHTML = '<p style="color:gray;">No trips found. Start one!</p>';
             });
         }
 
@@ -318,13 +363,13 @@
             if(!currentUser) return;
             const name = document.getElementById('newTripName').value;
             if(!name) return;
+            
             const newRef = push(ref(db, 'trips'));
+            
+            // Create Trip + Add Creator to Access List
             set(newRef, { 
-                meta: { 
-                    name: name, 
-                    createdBy: currentUser.email, // Tracking who made it
-                    created: Date.now() 
-                } 
+                meta: { name: name, created: Date.now() },
+                accessList: { 0: currentUser.email }
             });
             document.getElementById('newTripName').value = '';
         }
@@ -343,14 +388,17 @@
         }
 
         window.deleteCurrentTrip = () => {
-            if(confirm("Delete this trip forever?")) {
+            if(confirm("⚠️ Are you sure you want to delete this ENTIRE trip and all expenses? This cannot be undone.")) {
                 remove(ref(db, `trips/${currentTripId}`));
                 goHome();
             }
         }
 
+        // --- DETAILS LOGIC ---
+
         function startTripListeners() {
-            // 1. Travelers
+            
+            // 1. Travelers & Members List
             onValue(ref(db, `trips/${currentTripId}/travelers`), (s) => {
                 const data = s.val();
                 travelers = [];
@@ -363,11 +411,26 @@
                 if(data) {
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
-                        list.innerHTML += `<div class="list-item"><span>${v.name}</span> <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i></div>`;
+                        
+                        // Display in Squad List
+                        // Note: We show email if available (it might not be for old data)
+                        const emailDisplay = v.email ? `<br><span style="font-size:0.65rem; color:var(--text-muted);">${v.email}</span>` : '';
+                        
+                        list.innerHTML += `
+                            <div class="list-item">
+                                <div>
+                                    <span style="font-weight:600;">${v.name}</span>
+                                    ${emailDisplay}
+                                </div>
+                                <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i>
+                            </div>`;
+                        
+                        // Add to Dropdowns
                         let opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name;
                         payer.appendChild(opt);
 
-                        const cardId = `card-${v.name}`;
+                        // Add to Split Selector
+                        const cardId = `card-${v.name.replace(/\s/g, '')}`;
                         selector.innerHTML += `
                             <div class="person-card" id="${cardId}" onclick="togglePerson('${cardId}')">
                                 <i class="fas fa-user-circle"></i>
@@ -386,6 +449,7 @@
                 const display = document.getElementById('currencyDisplay');
                 sel.innerHTML = ''; display.innerHTML = '';
                 
+                // Always have USD default if empty
                 if(!data) { sel.innerHTML = '<option value="USD">USD</option>'; } 
                 else {
                     Object.entries(data).forEach(([k, v]) => {
@@ -428,7 +492,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-weight:700;">${v.currency} ${v.amount}</div>
+                                    <div style="font-weight:700;">${v.currency || ''} ${v.amount}</div>
                                     <i class="fas fa-trash" style="font-size:0.8rem; color:#ef4444; opacity:0.6; cursor:pointer;" onclick="deleteItem('expenses/${k}')"></i>
                                 </div>
                             </div>`;
@@ -439,7 +503,35 @@
             });
         }
 
-        // --- UI HELPERS & ACTIONS ---
+        // --- ACTIONS ---
+
+        // MERGED: Add Member + Grant Access
+        window.addMember = () => {
+            const name = document.getElementById('newMemberName').value;
+            const email = document.getElementById('newMemberEmail').value;
+
+            if(!name) { alert("Please enter a name."); return; }
+            
+            // 1. Add to Travelers (Visual / Splitting)
+            push(ref(db, `trips/${currentTripId}/travelers`), { name: name, email: email });
+
+            // 2. If Email provided, Add to Access List (Security)
+            if(email && email.includes('@')) {
+                push(ref(db, `trips/${currentTripId}/accessList`), email);
+            }
+
+            document.getElementById('newMemberName').value = '';
+            document.getElementById('newMemberEmail').value = '';
+        }
+
+        window.addCurrency = () => {
+            const code = document.getElementById('newCurrency').value.toUpperCase();
+            if(code) {
+                push(ref(db, `trips/${currentTripId}/currencies`), { code });
+                document.getElementById('newCurrency').value = '';
+            }
+        }
+
         window.togglePerson = (id) => {
             const card = document.getElementById(id);
             const checkbox = card.querySelector('input');
@@ -447,14 +539,6 @@
             checkbox.checked = !checkbox.checked;
         }
 
-        window.addTraveler = () => {
-            const name = document.getElementById('newTraveler').value;
-            if(name) { push(ref(db, `trips/${currentTripId}/travelers`), { name }); document.getElementById('newTraveler').value = ''; }
-        }
-        window.addCurrency = () => {
-            const code = document.getElementById('newCurrency').value.toUpperCase();
-            if(code) push(ref(db, `trips/${currentTripId}/currencies`), { code });
-        }
         window.addExpense = () => {
             const desc = document.getElementById('descInput').value;
             const amount = parseFloat(document.getElementById('amountInput').value);
@@ -470,7 +554,7 @@
 
             push(ref(db, `trips/${currentTripId}/expenses`), {
                 desc, amount, currency, category, payer, involved, 
-                addedBy: currentUser.email, // Tracking
+                addedBy: currentUser.email,
                 date: Date.now()
             });
 
@@ -486,18 +570,15 @@
         function recalc() {
             if(travelers.length === 0) return;
             let balances = {};
-            let totalSpent = {};
-            travelers.forEach(t => { balances[t] = 0; totalSpent[t] = 0; });
+            travelers.forEach(t => { balances[t] = 0; });
 
             expenses.forEach(ex => {
                 const share = ex.amount / ex.involved.length;
                 if(balances[ex.payer] !== undefined) balances[ex.payer] += ex.amount;
-                if(totalSpent[ex.payer] !== undefined) totalSpent[ex.payer] += ex.amount;
                 ex.involved.forEach(p => { if(balances[p] !== undefined) balances[p] -= share; });
             });
 
             renderSettlements(simplifyDebts(balances));
-            renderSpending(totalSpent);
         }
 
         function simplifyDebts(balances) {
@@ -529,17 +610,6 @@
             txs.forEach(t => {
                 div.innerHTML += `<div class="settle-row"><span><b>${t.from}</b> pays <b>${t.to}</b></span><span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span></div>`;
             });
-        }
-        function renderSpending(spendingObj) {
-            const container = document.getElementById('spendingList');
-            container.innerHTML = '';
-            const sorted = Object.entries(spendingObj).sort((a,b) => b[1] - a[1]);
-            sorted.forEach(([name, amount]) => {
-                if(amount > 0) {
-                    container.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:5px;"><span>${name}</span><span style="font-weight:bold;">${amount.toFixed(2)}</span></div>`;
-                }
-            });
-            if(container.innerHTML === '') container.innerHTML = '<span style="color:gray; font-size:0.8rem">No data yet.</span>';
         }
 
     </script>
