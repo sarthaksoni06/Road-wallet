@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Split the Bill.</title>
+    <title>Paise de Bro | Easy Expense </title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -124,6 +124,9 @@
         .admin-badge {
             background: var(--accent); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px;
         }
+
+        .action-icons i { margin-left: 10px; opacity: 0.7; transition: 0.2s; cursor: pointer; }
+        .action-icons i:hover { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -183,15 +186,17 @@
                     <aside>
                         
                         <div class="card" style="border: 1px solid var(--primary);">
-                            <h3><i class="fas fa-user-plus"></i> Add Member</h3>
+                            <h3><i class="fas fa-user-plus"></i> Members</h3>
                             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-                                This adds them to the split list AND grants them access to view the trip.
+                                Add/Edit members. Adding an email also grants them access to view this trip.
                             </p>
                             
+                            <input type="hidden" id="editMemberId">
+
                             <input type="text" id="newMemberName" placeholder="Name (e.g. Rahul)">
                             <input type="email" id="newMemberEmail" placeholder="Email (rahul@gmail.com)">
                             
-                            <button class="btn-primary" onclick="addMember()">Add to Squad</button>
+                            <button id="addMemberBtn" class="btn-primary" onclick="addMember()">Add to Squad</button>
                             
                             <div id="travelerList" style="margin-top: 15px;"></div>
                         </div>
@@ -266,7 +271,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, set, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
         // 🔴 Keys Pre-Filled 🔴
@@ -292,6 +297,7 @@
         let currentTripId = null;
         let travelers = [];
         let expenses = [];
+        let editingMemberId = null; // Track if we are editing
 
         // --- AUTHENTICATION ---
         function showStatus(msg) {
@@ -365,12 +371,21 @@
             if(!name) return;
             
             const newRef = push(ref(db, 'trips'));
+            const tripId = newRef.key;
             
-            // Create Trip + Add Creator to Access List
+            // 1. Create Trip Basic Info & Access List
             set(newRef, { 
                 meta: { name: name, created: Date.now() },
                 accessList: { 0: currentUser.email }
+            }).then(() => {
+                // 2. AUTO-ADD CREATOR TO TRAVELERS LIST
+                const creatorName = currentUser.displayName ? currentUser.displayName.split(' ')[0] : "Me";
+                push(ref(db, `trips/${tripId}/travelers`), {
+                    name: creatorName,
+                    email: currentUser.email
+                });
             });
+
             document.getElementById('newTripName').value = '';
         }
 
@@ -412,8 +427,7 @@
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
                         
-                        // Display in Squad List
-                        // Note: We show email if available (it might not be for old data)
+                        // Display in Squad List with EDIT icon
                         const emailDisplay = v.email ? `<br><span style="font-size:0.65rem; color:var(--text-muted);">${v.email}</span>` : '';
                         
                         list.innerHTML += `
@@ -422,7 +436,10 @@
                                     <span style="font-weight:600;">${v.name}</span>
                                     ${emailDisplay}
                                 </div>
-                                <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i>
+                                <div class="action-icons">
+                                    <i class="fas fa-pen" style="color:var(--primary);" onclick="startEditMember('${k}', '${v.name}', '${v.email || ''}')"></i>
+                                    <i class="fas fa-trash" style="color:#ef4444;" onclick="deleteItem('travelers/${k}')"></i>
+                                </div>
                             </div>`;
                         
                         // Add to Dropdowns
@@ -449,7 +466,6 @@
                 const display = document.getElementById('currencyDisplay');
                 sel.innerHTML = ''; display.innerHTML = '';
                 
-                // Always have USD default if empty
                 if(!data) { sel.innerHTML = '<option value="USD">USD</option>'; } 
                 else {
                     Object.entries(data).forEach(([k, v]) => {
@@ -505,19 +521,44 @@
 
         // --- ACTIONS ---
 
-        // MERGED: Add Member + Grant Access
+        // TRIGGER EDIT MODE
+        window.startEditMember = (key, name, email) => {
+            editingMemberId = key;
+            document.getElementById('newMemberName').value = name;
+            document.getElementById('newMemberEmail').value = email;
+            document.getElementById('addMemberBtn').innerText = "Update Member";
+            document.getElementById('addMemberBtn').style.background = "var(--success)";
+        }
+
+        // ADD OR UPDATE MEMBER
         window.addMember = () => {
             const name = document.getElementById('newMemberName').value;
             const email = document.getElementById('newMemberEmail').value;
 
             if(!name) { alert("Please enter a name."); return; }
             
-            // 1. Add to Travelers (Visual / Splitting)
-            push(ref(db, `trips/${currentTripId}/travelers`), { name: name, email: email });
+            if(editingMemberId) {
+                // --- UPDATE MODE ---
+                update(ref(db, `trips/${currentTripId}/travelers/${editingMemberId}`), {
+                    name: name,
+                    email: email
+                });
+                
+                // Also update Access List if email changed (Optional complex logic, simple add for now)
+                if(email && email.includes('@')) {
+                     push(ref(db, `trips/${currentTripId}/accessList`), email);
+                }
 
-            // 2. If Email provided, Add to Access List (Security)
-            if(email && email.includes('@')) {
-                push(ref(db, `trips/${currentTripId}/accessList`), email);
+                // Reset UI
+                editingMemberId = null;
+                document.getElementById('addMemberBtn').innerText = "Add to Squad";
+                document.getElementById('addMemberBtn').style.background = ""; // Reset gradient
+            } else {
+                // --- ADD MODE ---
+                push(ref(db, `trips/${currentTripId}/travelers`), { name: name, email: email });
+                if(email && email.includes('@')) {
+                    push(ref(db, `trips/${currentTripId}/accessList`), email);
+                }
             }
 
             document.getElementById('newMemberName').value = '';
