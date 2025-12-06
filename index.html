@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Easy Expense </title>
+    <title>Paise de Bro | Simple.Fast.Split. </title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -188,13 +188,13 @@
                         <div class="card" style="border: 1px solid var(--primary);">
                             <h3><i class="fas fa-user-plus"></i> Members</h3>
                             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-                                Add/Edit members. Adding an email also grants them access to view this trip.
+                                Add or Edit members. Email is optional (only needed if they want to log in).
                             </p>
                             
                             <input type="hidden" id="editMemberId">
 
                             <input type="text" id="newMemberName" placeholder="Name (e.g. Rahul)">
-                            <input type="email" id="newMemberEmail" placeholder="Email (rahul@gmail.com)">
+                            <input type="email" id="newMemberEmail" placeholder="Email (Optional - for access)">
                             
                             <button id="addMemberBtn" class="btn-primary" onclick="addMember()">Add to Squad</button>
                             
@@ -525,7 +525,9 @@
         window.startEditMember = (key, name, email) => {
             editingMemberId = key;
             document.getElementById('newMemberName').value = name;
-            document.getElementById('newMemberEmail').value = email;
+            // Handle undefined email
+            document.getElementById('newMemberEmail').value = (email === 'undefined') ? '' : email;
+            
             document.getElementById('addMemberBtn').innerText = "Update Member";
             document.getElementById('addMemberBtn').style.background = "var(--success)";
         }
@@ -544,7 +546,6 @@
                     email: email
                 });
                 
-                // Also update Access List if email changed (Optional complex logic, simple add for now)
                 if(email && email.includes('@')) {
                      push(ref(db, `trips/${currentTripId}/accessList`), email);
                 }
