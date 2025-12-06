@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Simple.Fast.Split. </title>
+    <title>Paise de Bro | Simple.Fast.Split</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -100,15 +100,6 @@
         button.btn-danger:hover { background: var(--accent); color: white; }
 
         /* --- UI ELEMENTS --- */
-        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        .person-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; user-select: none;
-        }
-        .person-card.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); transform: translateY(-2px); }
-        .person-card input { display: none; }
-        .person-card i { font-size: 1.5rem; margin-bottom: 5px; display: block; }
-
         .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
         @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -124,9 +115,39 @@
         .admin-badge {
             background: var(--accent); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .action-icons i { margin-left: 10px; opacity: 0.7; transition: 0.2s; cursor: pointer; }
         .action-icons i:hover { opacity: 1; transform: scale(1.1); }
+
+        /* --- SHARES UI --- */
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        
+        .person-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; user-select: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .person-card.active { 
+            background: var(--primary); border-color: var(--primary); 
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); 
+        }
+        /* Hidden Inputs */
+        .person-card input[type="checkbox"] { display: none; }
+        
+        /* Share Controls (Visible when Active) */
+        .share-controls {
+            display: none; /* Hidden by default */
+            align-items: center; gap: 5px; margin-top: 5px;
+            background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 10px;
+        }
+        .person-card.active .share-controls { display: flex; }
+
+        .share-btn {
+            background: rgba(255,255,255,0.2); border: none; color: white; width: 20px; height: 20px;
+            border-radius: 50%; cursor: pointer; font-size: 0.8rem; font-weight: bold; line-height: 1;
+        }
+        .share-btn:hover { background: white; color: var(--primary); }
+        .share-count { font-weight: 700; font-size: 0.9rem; min-width: 15px; }
+
     </style>
 </head>
 <body>
@@ -188,13 +209,12 @@
                         <div class="card" style="border: 1px solid var(--primary);">
                             <h3><i class="fas fa-user-plus"></i> Members</h3>
                             <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-                                Add or Edit members. Email is optional (only needed if they want to log in).
+                                Add/Edit members. Email is optional.
                             </p>
                             
                             <input type="hidden" id="editMemberId">
-
                             <input type="text" id="newMemberName" placeholder="Name (e.g. Rahul)">
-                            <input type="email" id="newMemberEmail" placeholder="Email (Optional - for access)">
+                            <input type="email" id="newMemberEmail" placeholder="Email (Optional)">
                             
                             <button id="addMemberBtn" class="btn-primary" onclick="addMember()">Add to Squad</button>
                             
@@ -208,7 +228,6 @@
 
                          <div class="card" style="opacity:0.8; border: 1px solid rgba(255,255,255,0.1);">
                             <h3><i class="fas fa-cog"></i> Settings</h3>
-                            
                             <div style="margin-bottom: 15px;">
                                 <label style="font-size:0.8rem;">Add Currency</label>
                                 <div style="display: flex; gap: 8px;">
@@ -217,14 +236,12 @@
                                 </div>
                                 <div id="currencyDisplay" style="margin-top:5px; font-size:0.8rem; color:var(--text-muted)"></div>
                             </div>
-
                             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                                 <button class="btn-danger" onclick="deleteCurrentTrip()">
                                     <i class="fas fa-trash"></i> Delete Entire Trip
                                 </button>
                             </div>
                          </div>
-
                     </aside>
 
                     <main>
@@ -249,7 +266,7 @@
                             </div>
 
                             <p style="margin: 15px 0 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
-                                Split with whom? (Select to include)
+                                Split with whom? (Select & Adjust Shares)
                             </p>
                             <div id="splitSelector" class="selection-grid"></div>
 
@@ -290,16 +307,14 @@
         const auth = getAuth(app); 
         const provider = new GoogleAuthProvider();
 
-        // 👑 SUPER ADMIN EMAIL
         const ADMIN_EMAIL = "sarthaksoni06@gmail.com";
-
         let currentUser = null;
         let currentTripId = null;
         let travelers = [];
         let expenses = [];
-        let editingMemberId = null; // Track if we are editing
+        let editingMemberId = null;
 
-        // --- AUTHENTICATION ---
+        // --- AUTH ---
         function showStatus(msg) {
             const el = document.getElementById('statusMessage');
             el.style.display = 'block';
@@ -313,12 +328,7 @@
                 document.getElementById('appContainer').classList.remove('hidden');
                 document.getElementById('userAvatar').src = user.photoURL;
                 document.getElementById('userName').innerText = user.displayName ? user.displayName.split(' ')[0] : 'User';
-                
-                // Show Admin Badge
-                if(user.email === ADMIN_EMAIL) {
-                    document.getElementById('userName').innerHTML += ' <span class="admin-badge">Admin</span>';
-                }
-
+                if(user.email === ADMIN_EMAIL) document.getElementById('userName').innerHTML += ' <span class="admin-badge">Admin</span>';
                 loadMyTrips(); 
             } else {
                 currentUser = null;
@@ -333,23 +343,18 @@
                 showStatus(error.code === 'auth/unauthorized-domain' ? "DOMAIN ERROR: Whitelist this URL in Firebase Console." : error.message);
             });
         });
-
         window.logOut = () => { signOut(auth).then(() => location.reload()); }
 
-        // --- TRIPS LOGIC ---
-
+        // --- TRIPS ---
         function loadMyTrips() {
             onValue(ref(db, 'trips'), (snapshot) => {
                 const data = snapshot.val();
                 const list = document.getElementById('tripsList');
                 list.innerHTML = '';
-                
                 if(data) {
                     Object.entries(data).forEach(([key, val]) => {
                         const accessList = val.accessList || {};
                         const allowedEmails = Object.values(accessList);
-                        
-                        // 🔒 Logic: Show if I am in Access List OR I am the Admin
                         if (allowedEmails.includes(currentUser.email) || currentUser.email === ADMIN_EMAIL) {
                             list.innerHTML += `
                                 <div class="trip-card" onclick="loadTrip('${key}', '${val.meta.name}')">
@@ -369,23 +374,12 @@
             if(!currentUser) return;
             const name = document.getElementById('newTripName').value;
             if(!name) return;
-            
             const newRef = push(ref(db, 'trips'));
             const tripId = newRef.key;
-            
-            // 1. Create Trip Basic Info & Access List
-            set(newRef, { 
-                meta: { name: name, created: Date.now() },
-                accessList: { 0: currentUser.email }
-            }).then(() => {
-                // 2. AUTO-ADD CREATOR TO TRAVELERS LIST
+            set(newRef, { meta: { name: name, created: Date.now() }, accessList: { 0: currentUser.email } }).then(() => {
                 const creatorName = currentUser.displayName ? currentUser.displayName.split(' ')[0] : "Me";
-                push(ref(db, `trips/${tripId}/travelers`), {
-                    name: creatorName,
-                    email: currentUser.email
-                });
+                push(ref(db, `trips/${tripId}/travelers`), { name: creatorName, email: currentUser.email });
             });
-
             document.getElementById('newTripName').value = '';
         }
 
@@ -396,24 +390,16 @@
             document.getElementById('currentTripTitle').innerText = name;
             startTripListeners();
         }
-
         window.goHome = () => {
             document.getElementById('dashboardView').classList.add('hidden');
             document.getElementById('tripSelectorView').classList.remove('hidden');
         }
-
         window.deleteCurrentTrip = () => {
-            if(confirm("⚠️ Are you sure you want to delete this ENTIRE trip and all expenses? This cannot be undone.")) {
-                remove(ref(db, `trips/${currentTripId}`));
-                goHome();
-            }
+            if(confirm("⚠️ Delete this ENTIRE trip? Cannot be undone.")) { remove(ref(db, `trips/${currentTripId}`)); goHome(); }
         }
 
-        // --- DETAILS LOGIC ---
-
+        // --- TRIP DATA ---
         function startTripListeners() {
-            
-            // 1. Travelers & Members List
             onValue(ref(db, `trips/${currentTripId}/travelers`), (s) => {
                 const data = s.val();
                 travelers = [];
@@ -426,57 +412,54 @@
                 if(data) {
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
-                        
-                        // Display in Squad List with EDIT icon
                         const emailDisplay = v.email ? `<br><span style="font-size:0.65rem; color:var(--text-muted);">${v.email}</span>` : '';
                         
                         list.innerHTML += `
                             <div class="list-item">
-                                <div>
-                                    <span style="font-weight:600;">${v.name}</span>
-                                    ${emailDisplay}
-                                </div>
+                                <div><span style="font-weight:600;">${v.name}</span>${emailDisplay}</div>
                                 <div class="action-icons">
                                     <i class="fas fa-pen" style="color:var(--primary);" onclick="startEditMember('${k}', '${v.name}', '${v.email || ''}')"></i>
                                     <i class="fas fa-trash" style="color:#ef4444;" onclick="deleteItem('travelers/${k}')"></i>
                                 </div>
                             </div>`;
                         
-                        // Add to Dropdowns
                         let opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name;
                         payer.appendChild(opt);
 
-                        // Add to Split Selector
-                        const cardId = `card-${v.name.replace(/\s/g, '')}`;
+                        // --- SHARES CARD GENERATION ---
+                        // Note: Using a safe ID format by stripping spaces
+                        const safeId = v.name.replace(/\s/g, '');
                         selector.innerHTML += `
-                            <div class="person-card" id="${cardId}" onclick="togglePerson('${cardId}')">
+                            <div class="person-card" id="card-${safeId}" onclick="togglePerson('${safeId}')">
                                 <i class="fas fa-user-circle"></i>
                                 <span style="font-size:0.8rem; font-weight:600;">${v.name}</span>
-                                <input type="checkbox" class="split-checkbox" value="${v.name}">
+                                
+                                <input type="checkbox" class="split-checkbox" value="${v.name}" id="cb-${safeId}">
+                                
+                                <div class="share-controls" onclick="event.stopPropagation()">
+                                    <button class="share-btn" onclick="changeShare('${safeId}', -1)">-</button>
+                                    <span class="share-count" id="share-${safeId}">1</span>x
+                                    <button class="share-btn" onclick="changeShare('${safeId}', 1)">+</button>
+                                </div>
                             </div>`;
                     });
                 }
                 recalc();
             });
 
-            // 2. Currencies
             onValue(ref(db, `trips/${currentTripId}/currencies`), (s) => {
                 const data = s.val();
                 const sel = document.getElementById('currencySelect');
                 const display = document.getElementById('currencyDisplay');
                 sel.innerHTML = ''; display.innerHTML = '';
-                
                 if(!data) { sel.innerHTML = '<option value="USD">USD</option>'; } 
-                else {
-                    Object.entries(data).forEach(([k, v]) => {
-                        let opt = document.createElement('option'); opt.value = v.code; opt.innerText = v.code;
-                        sel.appendChild(opt);
-                        display.innerHTML += `<span style="margin-right:5px; border:1px solid #555; padding:2px 4px; border-radius:4px;">${v.code}</span>`;
-                    });
-                }
+                else { Object.entries(data).forEach(([k, v]) => { 
+                    let opt = document.createElement('option'); opt.value = v.code; opt.innerText = v.code;
+                    sel.appendChild(opt);
+                    display.innerHTML += `<span style="margin-right:5px; border:1px solid #555; padding:2px 4px; border-radius:4px;">${v.code}</span>`;
+                }); }
             });
 
-            // 3. Expenses
             onValue(ref(db, `trips/${currentTripId}/expenses`), (s) => {
                 const data = s.val();
                 expenses = [];
@@ -494,6 +477,16 @@
                         if(v.category === 'Stay') icon = 'fas fa-bed';
                         if(v.category === 'Fun') icon = 'fas fa-glass-cheers';
 
+                        // Detect split type for display
+                        let splitText = "";
+                        if(Array.isArray(v.involved)) {
+                            splitText = `Split equally among ${v.involved.length}`;
+                        } else {
+                            // It's an object (Weighted split)
+                            const count = Object.keys(v.involved).length;
+                            splitText = `Split by shares among ${count}`;
+                        }
+
                         list.innerHTML += `
                             <div class="list-item">
                                 <div style="display:flex; align-items:center; gap:12px;">
@@ -502,9 +495,7 @@
                                     </div>
                                     <div>
                                         <div style="font-weight:600;">${v.desc} <span class="cat-tag">${v.category || 'Misc'}</span></div>
-                                        <div style="font-size:0.8rem; color:var(--text-muted);">
-                                            ${v.payer} paid for ${v.involved.length} people
-                                        </div>
+                                        <div style="font-size:0.8rem; color:var(--text-muted);">${v.payer} • ${splitText}</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
@@ -519,66 +510,63 @@
             });
         }
 
-        // --- ACTIONS ---
+        // --- SHARES LOGIC ---
+        window.togglePerson = (safeId) => {
+            const card = document.getElementById(`card-${safeId}`);
+            const checkbox = document.getElementById(`cb-${safeId}`);
+            
+            // Toggle Logic
+            if(card.classList.contains('active')) {
+                card.classList.remove('active');
+                checkbox.checked = false;
+            } else {
+                card.classList.add('active');
+                checkbox.checked = true;
+            }
+        }
 
-        // TRIGGER EDIT MODE
+        window.changeShare = (safeId, delta) => {
+            const span = document.getElementById(`share-${safeId}`);
+            let val = parseInt(span.innerText);
+            val += delta;
+            if(val < 1) val = 1; // Min 1 share
+            if(val > 10) val = 10; // Max 10 shares
+            span.innerText = val;
+        }
+
+        // --- MEMBERS & ACTIONS ---
         window.startEditMember = (key, name, email) => {
             editingMemberId = key;
             document.getElementById('newMemberName').value = name;
-            // Handle undefined email
             document.getElementById('newMemberEmail').value = (email === 'undefined') ? '' : email;
-            
             document.getElementById('addMemberBtn').innerText = "Update Member";
             document.getElementById('addMemberBtn').style.background = "var(--success)";
         }
 
-        // ADD OR UPDATE MEMBER
         window.addMember = () => {
             const name = document.getElementById('newMemberName').value;
             const email = document.getElementById('newMemberEmail').value;
-
             if(!name) { alert("Please enter a name."); return; }
             
-            if(editingMemberId) {
-                // --- UPDATE MODE ---
-                update(ref(db, `trips/${currentTripId}/travelers/${editingMemberId}`), {
-                    name: name,
-                    email: email
-                });
-                
-                if(email && email.includes('@')) {
-                     push(ref(db, `trips/${currentTripId}/accessList`), email);
-                }
+            const payload = { name: name, email: email };
 
-                // Reset UI
+            if(editingMemberId) {
+                update(ref(db, `trips/${currentTripId}/travelers/${editingMemberId}`), payload);
+                if(email && email.includes('@')) push(ref(db, `trips/${currentTripId}/accessList`), email);
                 editingMemberId = null;
                 document.getElementById('addMemberBtn').innerText = "Add to Squad";
-                document.getElementById('addMemberBtn').style.background = ""; // Reset gradient
+                document.getElementById('addMemberBtn').style.background = "";
             } else {
-                // --- ADD MODE ---
-                push(ref(db, `trips/${currentTripId}/travelers`), { name: name, email: email });
-                if(email && email.includes('@')) {
-                    push(ref(db, `trips/${currentTripId}/accessList`), email);
-                }
+                push(ref(db, `trips/${currentTripId}/travelers`), payload);
+                if(email && email.includes('@')) push(ref(db, `trips/${currentTripId}/accessList`), email);
             }
-
             document.getElementById('newMemberName').value = '';
             document.getElementById('newMemberEmail').value = '';
         }
 
         window.addCurrency = () => {
             const code = document.getElementById('newCurrency').value.toUpperCase();
-            if(code) {
-                push(ref(db, `trips/${currentTripId}/currencies`), { code });
-                document.getElementById('newCurrency').value = '';
-            }
-        }
-
-        window.togglePerson = (id) => {
-            const card = document.getElementById(id);
-            const checkbox = card.querySelector('input');
-            card.classList.toggle('active');
-            checkbox.checked = !checkbox.checked;
+            if(code) { push(ref(db, `trips/${currentTripId}/currencies`), { code }); document.getElementById('newCurrency').value = ''; }
         }
 
         window.addExpense = () => {
@@ -587,37 +575,75 @@
             const currency = document.getElementById('currencySelect').value;
             const category = document.getElementById('categorySelect').value;
             const payer = document.getElementById('payerSelect').value;
-            const involved = [];
-            document.querySelectorAll('.split-checkbox:checked').forEach(cb => involved.push(cb.value));
+            
+            // --- NEW: COLLECT INVOLVED + SHARES ---
+            const involvedData = {};
+            let hasPeople = false;
 
-            if(!desc || !amount || !payer || payer === "Who Paid?" || involved.length === 0) {
+            document.querySelectorAll('.split-checkbox:checked').forEach(cb => {
+                hasPeople = true;
+                const name = cb.value;
+                const safeId = name.replace(/\s/g, '');
+                // Read share count from DOM
+                const shareCount = parseInt(document.getElementById(`share-${safeId}`).innerText);
+                involvedData[name] = shareCount;
+            });
+
+            if(!desc || !amount || !payer || payer === "Who Paid?" || !hasPeople) {
                 alert("Please fill all fields and select split participants."); return;
             }
 
             push(ref(db, `trips/${currentTripId}/expenses`), {
-                desc, amount, currency, category, payer, involved, 
+                desc, amount, currency, category, payer, 
+                involved: involvedData, // Saving object {Name: ShareCount}
                 addedBy: currentUser.email,
                 date: Date.now()
             });
 
             document.getElementById('descInput').value = '';
             document.getElementById('amountInput').value = '';
-            document.querySelectorAll('.person-card').forEach(c => c.classList.remove('active'));
+            // Reset UI
+            document.querySelectorAll('.person-card').forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.share-count').innerText = "1"; // Reset shares to 1
+            });
             document.querySelectorAll('.split-checkbox').forEach(c => c.checked = false);
         }
 
         window.deleteItem = (path) => { remove(ref(db, `trips/${currentTripId}/${path}`)); }
 
-        // --- MATH ---
+        // --- UPDATED MATH FOR SHARES ---
         function recalc() {
             if(travelers.length === 0) return;
             let balances = {};
             travelers.forEach(t => { balances[t] = 0; });
 
             expenses.forEach(ex => {
-                const share = ex.amount / ex.involved.length;
-                if(balances[ex.payer] !== undefined) balances[ex.payer] += ex.amount;
-                ex.involved.forEach(p => { if(balances[p] !== undefined) balances[p] -= share; });
+                const payer = ex.payer;
+                
+                // Add positive amount to payer (they are owed this)
+                if(balances[payer] !== undefined) balances[payer] += ex.amount;
+
+                // Handle Subtraction (Debts)
+                if(Array.isArray(ex.involved)) {
+                    // OLD LOGIC (Backward compatibility or Equal Split)
+                    const splitAmt = ex.amount / ex.involved.length;
+                    ex.involved.forEach(p => {
+                        if(balances[p] !== undefined) balances[p] -= splitAmt;
+                    });
+                } else {
+                    // NEW LOGIC (Weighted/Shares)
+                    // ex.involved is { 'Alice': 1, 'Bob': 2 }
+                    let totalShares = 0;
+                    Object.values(ex.involved).forEach(s => totalShares += s);
+                    
+                    const costPerShare = ex.amount / totalShares;
+                    
+                    Object.entries(ex.involved).forEach(([person, shares]) => {
+                        const debt = costPerShare * shares;
+                        if(balances[person] !== undefined) balances[person] -= debt;
+                    });
+                }
             });
 
             renderSettlements(simplifyDebts(balances));
@@ -653,7 +679,6 @@
                 div.innerHTML += `<div class="settle-row"><span><b>${t.from}</b> pays <b>${t.to}</b></span><span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span></div>`;
             });
         }
-
     </script>
 </body>
 </html>
