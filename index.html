@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Green Theme</title>
+    <title>Paise de Bro | Material 3</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -12,34 +12,33 @@
 
     <style>
         :root {
-            /* --- MATERIAL 3 TEAL/EMERALD THEME --- */
-            /* Primary: Deep Emerald */
-            --md-sys-color-primary: #006C4C;
+            /* --- MATERIAL 3 BASELINE THEME (Light Mode) --- */
+            --md-sys-color-primary: #6750A4;
             --md-sys-color-on-primary: #FFFFFF;
-            /* Container: Mint Green */
-            --md-sys-color-primary-container: #89F8C7;
-            --md-sys-color-on-primary-container: #002114;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
 
-            /* Secondary: Slate Blue/Grey */
-            --md-sys-color-secondary: #4C6358;
-            --md-sys-color-secondary-container: #CEE9DA;
-            --md-sys-color-on-secondary-container: #092016;
+            --md-sys-color-secondary: #625B71;
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1D192B;
 
-            /* Error */
-            --md-sys-color-error: #BA1A1A;
-            --md-sys-color-error-container: #FFDAD6;
-            --md-sys-color-on-error-container: #410002;
+            --md-sys-color-tertiary: #7D5260;
+            --md-sys-color-tertiary-container: #FFD8E4;
+            --md-sys-color-on-tertiary-container: #31111D;
 
-            /* Backgrounds */
-            --md-sys-color-background: #FBFDFA;
-            --md-sys-color-on-background: #191C1B;
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-error-container: #F9DEDC;
+            --md-sys-color-on-error-container: #410E0B;
+
+            --md-sys-color-background: #FFFBFE;
+            --md-sys-color-on-background: #1C1B1F;
             
-            --md-sys-color-surface: #FBFDFA;
-            --md-sys-color-surface-container: #EEF1EF; 
-            --md-sys-color-surface-container-high: #E8EBE9;
+            --md-sys-color-surface: #FFFBFE;
+            --md-sys-color-surface-container: #F3F0F5; /* Slightly darker for cards */
+            --md-sys-color-surface-container-high: #ECE6F0;
             
-            --md-sys-color-outline: #707973;
-            --md-sys-color-outline-variant: #BFC9C2;
+            --md-sys-color-outline: #79747E;
+            --md-sys-color-outline-variant: #CAC4D0;
 
             --radius-xl: 28px;
             --radius-lg: 16px;
@@ -70,7 +69,7 @@
 
         /* --- M3 TYPOGRAPHY --- */
         h1 { font-size: 3rem; font-weight: 400; line-height: 1.1; color: var(--md-sys-color-on-background); margin-bottom: 8px; }
-        h2 { font-size: 2rem; font-weight: 400; color: var(--md-sys-color-on-background); }
+        h2 { font-size: 2rem; font-weight: 400; color: var(--md-sys-color-on-surface); }
         h3 { font-size: 1.3rem; font-weight: 500; color: var(--md-sys-color-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         p { font-size: 1rem; line-height: 1.5; color: var(--md-sys-color-secondary); }
 
@@ -127,7 +126,7 @@
         }
         input:focus, select:focus {
             border-bottom: 2px solid var(--md-sys-color-primary);
-            background-color: #E2E2E2; 
+            background-color: #E6E1E5; /* Slightly darker on focus */
             outline: none;
         }
 
@@ -137,6 +136,7 @@
             border-radius: var(--radius-lg);
             padding: 24px;
             margin-bottom: 24px;
+            /* Elevation is generally handled by color in M3 light mode, but subtle shadow helps */
             box-shadow: 0 0 0 0 transparent; 
         }
 
@@ -149,7 +149,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(180deg, #E6F4EA 0%, #FFFFFF 100%);
+            background: linear-gradient(180deg, #F3EDF7 0%, #FFFBFE 100%);
             text-align: center;
         }
         
@@ -249,7 +249,6 @@
             border: none; background: #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold;
-            color: var(--md-sys-color-primary);
         }
 
         /* --- COMPONENT: LIST ITEM --- */
@@ -262,21 +261,19 @@
         
         .icon-box {
             width: 40px; height: 40px; border-radius: 50%;
-            background: var(--md-sys-color-secondary-container);
-            color: var(--md-sys-color-on-secondary-container);
+            background: var(--md-sys-color-tertiary-container);
+            color: var(--md-sys-color-on-tertiary-container);
             display: flex; align-items: center; justify-content: center;
             margin-right: 16px;
         }
 
         .settlement-card {
-            background: #FFFFFF;
-            border: 1px solid var(--md-sys-color-outline-variant);
-            color: var(--md-sys-color-on-background);
+            background: #E6F4EA; /* Minty Green for money */
+            color: #137333;
             padding: 16px; border-radius: 12px;
             margin-bottom: 8px;
             font-weight: 500;
             display: flex; justify-content: space-between;
-            border-left: 5px solid var(--md-sys-color-primary);
         }
 
         /* Admin Badge */
@@ -356,8 +353,8 @@
                             <div id="travelerList" style="margin-top: 24px;"></div>
                         </div>
 
-                        <div class="card" style="background-color: #F0FDF4;">
-                            <h3><span class="material-icons-round">paid</span> Settlements</h3>
+                        <div class="card" style="background-color: #F7FBF8;">
+                            <h3><span class="material-icons-round" style="color:#137333">paid</span> Settlements</h3>
                             <div id="simplifiedSettlements"></div>
                         </div>
 
@@ -398,7 +395,7 @@
                                 <select id="payerSelect"><option disabled selected>Who Paid?</option></select>
                             </div>
 
-                            <p style="margin: 24px 0 12px; font-weight: 500; color: var(--md-sys-color-on-background);">Split with whom?</p>
+                            <p style="margin: 24px 0 12px; font-weight: 500; color: var(--md-sys-color-on-surface);">Split with whom?</p>
                             
                             <div id="splitSelector" class="split-grid"></div>
 
@@ -438,7 +435,7 @@
         const auth = getAuth(app); 
         const provider = new GoogleAuthProvider();
 
-        const ADMIN_EMAIL = "sarthaksoni06@gmail.com";
+        const ADMIN_EMAIL = "sarthaksonin06@gmail.com";
         let currentUser = null;
         let currentTripId = null;
         let travelers = [];
@@ -548,7 +545,7 @@
                         payer.appendChild(opt);
 
                         const safeId = v.name.replace(/\s/g, '');
-                        // CHIP UI
+                        // NEW CHIP UI
                         selector.innerHTML += `
                             <div class="person-chip" id="card-${safeId}" onclick="togglePerson('${safeId}')">
                                 <span style="font-weight:500;">${v.name}</span>
@@ -606,7 +603,7 @@
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-weight:700; color:var(--md-sys-color-primary); font-size:1.1rem;">${v.currency || ''} ${v.amount}</div>
+                                    <div style="font-weight:700; color:var(--md-sys-color-on-surface); font-size:1.1rem;">${v.currency || ''} ${v.amount}</div>
                                     <i class="fas fa-trash" style="font-size:0.9rem; color:var(--md-sys-color-error); cursor:pointer; margin-top:4px;" onclick="deleteItem('expenses/${k}')"></i>
                                 </div>
                             </div>`;
