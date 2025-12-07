@@ -3,280 +3,412 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paise de Bro | Simple.Fast.Split</title>
+    <title>Paise de Bro | Green Theme</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #8b5cf6;
-            --accent: #f43f5e;
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.75);
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #10b981;
+            /* --- MATERIAL 3 TEAL/EMERALD THEME --- */
+            /* Primary: Deep Emerald */
+            --md-sys-color-primary: #006C4C;
+            --md-sys-color-on-primary: #FFFFFF;
+            /* Container: Mint Green */
+            --md-sys-color-primary-container: #89F8C7;
+            --md-sys-color-on-primary-container: #002114;
+
+            /* Secondary: Slate Blue/Grey */
+            --md-sys-color-secondary: #4C6358;
+            --md-sys-color-secondary-container: #CEE9DA;
+            --md-sys-color-on-secondary-container: #092016;
+
+            /* Error */
+            --md-sys-color-error: #BA1A1A;
+            --md-sys-color-error-container: #FFDAD6;
+            --md-sys-color-on-error-container: #410002;
+
+            /* Backgrounds */
+            --md-sys-color-background: #FBFDFA;
+            --md-sys-color-on-background: #191C1B;
+            
+            --md-sys-color-surface: #FBFDFA;
+            --md-sys-color-surface-container: #EEF1EF; 
+            --md-sys-color-surface-container-high: #E8EBE9;
+            
+            --md-sys-color-outline: #707973;
+            --md-sys-color-outline-variant: #BFC9C2;
+
+            --radius-xl: 28px;
+            --radius-lg: 16px;
+            --radius-pill: 100px;
+            
+            --elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+            --elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
 
         body {
-            background-color: var(--bg);
-            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
-            color: var(--text);
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
             min-height: 100vh;
-            padding: 2rem;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 24px; 
+            width: 100%;
+        }
+
         .hidden { display: none !important; }
 
-        /* --- CARDS --- */
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        /* --- M3 TYPOGRAPHY --- */
+        h1 { font-size: 3rem; font-weight: 400; line-height: 1.1; color: var(--md-sys-color-on-background); margin-bottom: 8px; }
+        h2 { font-size: 2rem; font-weight: 400; color: var(--md-sys-color-on-background); }
+        h3 { font-size: 1.3rem; font-weight: 500; color: var(--md-sys-color-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        p { font-size: 1rem; line-height: 1.5; color: var(--md-sys-color-secondary); }
+
+        /* --- M3 COMPONENTS --- */
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            height: 48px;
+            padding: 0 24px;
+            border-radius: var(--radius-pill);
+            border: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            box-shadow: var(--elevation-1);
+        }
+        .btn-primary:hover {
+            box-shadow: var(--elevation-2);
+            opacity: 0.9;
         }
 
-        /* --- LOGIN SCREEN --- */
-        .login-container {
-            height: 80vh;
+        .btn-danger {
+            background-color: var(--md-sys-color-error-container);
+            color: var(--md-sys-color-on-error-container);
+            height: 40px;
+            padding: 0 20px;
+            border-radius: var(--radius-pill);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Inputs (Filled Style) */
+        .input-group { margin-bottom: 16px; }
+        input, select {
+            width: 100%;
+            height: 56px;
+            background-color: var(--md-sys-color-surface-container-high);
+            border: none;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            border-radius: 4px 4px 0 0;
+            padding: 8px 16px;
+            font-size: 1rem;
+            color: var(--md-sys-color-on-background);
+            transition: 0.2s;
+            margin-bottom: 12px;
+        }
+        input:focus, select:focus {
+            border-bottom: 2px solid var(--md-sys-color-primary);
+            background-color: #E2E2E2; 
+            outline: none;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--md-sys-color-surface-container);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 0 0 0 transparent; 
+        }
+
+        /* --- SPECIFIC VIEWS --- */
+
+        /* Login */
+        .login-view {
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(180deg, #E6F4EA 0%, #FFFFFF 100%);
             text-align: center;
         }
         
         .google-btn {
-            background: white; color: #333; display: flex; align-items: center; gap: 10px;
-            padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer;
-            transition: 0.2s; border: none; font-size: 1rem; z-index: 10;
-        }
-        .google-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-
-        #statusMessage {
-            margin-top: 20px; padding: 15px; border-radius: 8px;
-            background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444;
-            color: #fca5a5; max-width: 400px; font-size: 0.9rem; display: none;
-        }
-
-        /* --- USER HEADER --- */
-        .user-header {
-            position: absolute; top: 20px; right: 20px;
+            background: #FFFFFF;
+            color: #1F1F1F;
+            border: 1px solid #747775;
+            height: 48px;
+            padding: 0 24px;
+            border-radius: var(--radius-pill);
+            font-weight: 500;
             display: flex; align-items: center; gap: 10px;
-            background: rgba(0,0,0,0.3); padding: 5px 15px 5px 5px;
-            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
-            z-index: 100;
+            cursor: pointer;
+            margin-top: 20px;
         }
-        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); }
-        .logout-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; }
-        .logout-btn:hover { color: var(--accent); }
 
-        /* --- TYPOGRAPHY & BUTTONS --- */
-        h1 { font-weight: 800; background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%); -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem; }
-        h3 { font-weight: 600; letter-spacing: 0.5px; margin-bottom: 1rem; }
+        /* App Header */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px;
+            background: var(--md-sys-color-surface-container);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            margin-bottom: 24px;
+        }
         
-        input, select {
-            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem; border-radius: 12px; color: white; outline: none; margin-bottom: 12px;
+        .user-chip {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--md-sys-color-primary-container);
+            padding: 6px 16px 6px 6px;
+            border-radius: var(--radius-pill);
+            color: var(--md-sys-color-on-primary-container);
+            font-weight: 500;
         }
-        input:focus, select:focus { border-color: var(--primary); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; }
 
-        button.btn-primary {
-            width: 100%; padding: 1rem; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
-            background: linear-gradient(90deg, var(--primary), var(--accent)); color: white;
-            text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
+        /* Trip Grid */
+        .trip-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;
+            margin-top: 32px;
         }
-        button.btn-danger { width: auto; padding: 0.7rem; background: rgba(244, 63, 94, 0.2); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition:0.2s; }
-        button.btn-danger:hover { background: var(--accent); color: white; }
-
-        /* --- UI ELEMENTS --- */
-        .grid-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
-        @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .cat-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.1); text-transform: uppercase; margin-left: 8px; }
-        .settle-row { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); padding: 10px; margin-bottom: 8px; border-radius: 0 8px 8px 0; font-size: 0.9rem; display: flex; justify-content: space-between; }
-    
         .trip-card {
-            background: rgba(255,255,255,0.05); padding: 1rem 2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer; transition: 0.2s; min-width: 200px; text-align: center;
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: 0.2s;
+            height: 140px;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
-        .trip-card:hover { border-color: var(--primary); transform: translateY(-3px); }
-        
-        .admin-badge {
-            background: var(--accent); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .action-icons i { margin-left: 10px; opacity: 0.7; transition: 0.2s; cursor: pointer; }
-        .action-icons i:hover { opacity: 1; transform: scale(1.1); }
+        .trip-card:hover { transform: translateY(-4px); box-shadow: var(--elevation-1); }
 
-        /* --- SHARES UI --- */
-        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 15px; }
-        
-        .person-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-            padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; user-select: none;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* Dashboard Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
         }
-        .person-card.active { 
-            background: var(--primary); border-color: var(--primary); 
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); 
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+        /* --- COMPONENT: SHARES GRID (Chips) --- */
+        .split-grid {
+            display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
         }
-        /* Hidden Inputs */
-        .person-card input[type="checkbox"] { display: none; }
         
-        /* Share Controls (Visible when Active) */
+        .person-chip {
+            background: var(--md-sys-color-surface);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 12px;
+            padding: 8px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 80px;
+        }
+
+        .person-chip.active {
+            background: var(--md-sys-color-secondary-container);
+            border-color: transparent;
+            color: var(--md-sys-color-on-secondary-container);
+        }
+
+        .person-chip input { display: none; } /* Hide checkbox */
+
         .share-controls {
-            display: none; /* Hidden by default */
-            align-items: center; gap: 5px; margin-top: 5px;
-            background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 10px;
+            display: none;
+            margin-top: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 100px;
+            padding: 2px;
         }
-        .person-card.active .share-controls { display: flex; }
+        .person-chip.active .share-controls { display: flex; align-items: center; gap: 8px; }
+        
+        .circle-btn {
+            width: 24px; height: 24px; border-radius: 50%;
+            border: none; background: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+            color: var(--md-sys-color-primary);
+        }
 
-        .share-btn {
-            background: rgba(255,255,255,0.2); border: none; color: white; width: 20px; height: 20px;
-            border-radius: 50%; cursor: pointer; font-size: 0.8rem; font-weight: bold; line-height: 1;
+        /* --- COMPONENT: LIST ITEM --- */
+        .list-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
         }
-        .share-btn:hover { background: white; color: var(--primary); }
-        .share-count { font-weight: 700; font-size: 0.9rem; min-width: 15px; }
+        .list-row:last-child { border-bottom: none; }
+        
+        .icon-box {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 16px;
+        }
+
+        .settlement-card {
+            background: #FFFFFF;
+            border: 1px solid var(--md-sys-color-outline-variant);
+            color: var(--md-sys-color-on-background);
+            padding: 16px; border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            display: flex; justify-content: space-between;
+            border-left: 5px solid var(--md-sys-color-primary);
+        }
+
+        /* Admin Badge */
+        .admin-badge {
+            background: #000; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        #statusMessage {
+            margin-top: 10px; color: var(--md-sys-color-error); font-weight: 500;
+        }
 
     </style>
 </head>
 <body>
 
-    <div id="loginView" class="hidden login-container">
-        <h1 style="font-size: 4rem; margin-bottom: 10px;">Paise de Bro</h1>
-        <p style="color: var(--text-muted); margin-bottom: 40px;">Secure Expenses for the Squad.</p>
-        
-        <button id="googleLoginBtn" class="google-btn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-            Sign in with Google
-        </button>
-
-        <div id="statusMessage"></div>
+    <div id="loginView" class="hidden login-view">
+        <div style="max-width: 400px; padding: 20px;">
+            <h1 style="color: var(--md-sys-color-primary); font-weight: 500;">Paise de Bro</h1>
+            <p style="margin-bottom: 32px; font-size: 1.2rem;">Modern. Simple. Fair.</p>
+            
+            <button id="googleLoginBtn" class="google-btn" style="margin: 0 auto;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+                Continue with Google
+            </button>
+            <div id="statusMessage"></div>
+        </div>
     </div>
 
     <div id="appContainer" class="hidden">
         
-        <div class="user-header">
-            <img id="userAvatar" class="user-avatar" src="" alt="User">
-            <div style="display:flex; flex-direction:column;">
-                <span id="userName" style="font-size:0.8rem; font-weight:600;">User</span>
-                <button class="logout-btn" onclick="logOut()">Sign Out</button>
+        <div class="top-bar container">
+            <span style="font-size: 1.25rem; font-weight: 500; color: var(--md-sys-color-primary);">Paise de Bro</span>
+            <div class="user-chip">
+                <img id="userAvatar" class="user-avatar" src="" alt="User">
+                <span id="userName">User</span>
+                <i class="material-icons-round" onclick="logOut()" style="cursor: pointer; font-size: 1.2rem; margin-left: 8px; opacity: 0.7;">logout</i>
             </div>
         </div>
 
         <div class="container">
             
             <div id="tripSelectorView">
-                <div style="text-align: center; margin-top: 10vh; margin-bottom: 3rem;">
-                    <h1 style="font-size: 4rem;">Paise de Bro</h1>
-                    <p style="color: var(--text-muted); font-size: 1.2rem;">Your Private Trips Dashboard</p>
+                <div style="text-align: center; padding: 40px 0;">
+                    <h1 style="font-size: 2.5rem;">Your Trips</h1>
                 </div>
 
-                <div class="card" style="max-width: 400px; margin: 0 auto;">
-                    <input type="text" id="newTripName" placeholder="Trip Name (e.g. Manali 2025)">
-                    <button class="btn-primary" onclick="createTrip()">Start New Trip</button>
+                <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center; border: 1px solid var(--md-sys-color-outline-variant);">
+                    <h3>New Adventure?</h3>
+                    <input type="text" id="newTripName" placeholder="Trip Name (e.g. Goa 2025)" style="background: white;">
+                    <button class="btn-primary" onclick="createTrip()" style="width: 100%; margin-top: 8px;">Create Trip</button>
                 </div>
 
-                <div style="text-align: center; margin-top: 3rem;">
-                    <h3 style="justify-content: center; color: var(--text-muted);">Trips You Can Access</h3>
-                    <div id="tripsList" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;"></div>
-                </div>
+                <div id="tripsList" class="trip-grid">
+                    </div>
             </div>
 
             <div id="dashboardView" class="hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <div>
-                        <button onclick="goHome()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer;">
-                            <i class="fas fa-arrow-left"></i> Back to Trips
-                        </button>
-                        <h1 id="currentTripTitle" style="margin-top: 10px;">Trip Name</h1>
-                    </div>
+                <div style="margin-bottom: 24px;">
+                    <button onclick="goHome()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:8px; color:var(--md-sys-color-secondary); font-size: 1rem; margin-bottom: 8px;">
+                        <i class="material-icons-round">arrow_back</i> Back to Trips
+                    </button>
+                    <h1 id="currentTripTitle">Trip Name</h1>
                 </div>
 
-                <div class="grid-layout">
+                <div class="dashboard-grid">
                     <aside>
-                        
-                        <div class="card" style="border: 1px solid var(--primary);">
-                            <h3><i class="fas fa-user-plus"></i> Members</h3>
-                            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-                                Add/Edit members. Email is optional.
-                            </p>
+                        <div class="card">
+                            <h3><span class="material-icons-round">group_add</span> Members</h3>
                             
                             <input type="hidden" id="editMemberId">
-                            <input type="text" id="newMemberName" placeholder="Name (e.g. Rahul)">
+                            <input type="text" id="newMemberName" placeholder="Name">
                             <input type="email" id="newMemberEmail" placeholder="Email (Optional)">
                             
-                            <button id="addMemberBtn" class="btn-primary" onclick="addMember()">Add to Squad</button>
+                            <button id="addMemberBtn" class="btn-primary" style="width:100%;" onclick="addMember()">Add Member</button>
                             
-                            <div id="travelerList" style="margin-top: 15px;"></div>
+                            <div id="travelerList" style="margin-top: 24px;"></div>
                         </div>
 
-                        <div class="card">
-                            <h3><i class="fas fa-handshake"></i> Settlements</h3>
+                        <div class="card" style="background-color: #F0FDF4;">
+                            <h3><span class="material-icons-round">paid</span> Settlements</h3>
                             <div id="simplifiedSettlements"></div>
                         </div>
 
-                         <div class="card" style="opacity:0.8; border: 1px solid rgba(255,255,255,0.1);">
-                            <h3><i class="fas fa-cog"></i> Settings</h3>
-                            <div style="margin-bottom: 15px;">
-                                <label style="font-size:0.8rem;">Add Currency</label>
+                         <div class="card">
+                            <h3><span class="material-icons-round">settings</span> Settings</h3>
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-size:0.8rem; color:var(--md-sys-color-secondary);">Add Currency</label>
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="newCurrency" placeholder="Code (e.g. GBP)" style="margin-bottom:0;">
-                                    <button onclick="addCurrency()" style="width:auto; padding:0.5rem 1rem;">+</button>
+                                    <input type="text" id="newCurrency" placeholder="Code (e.g. USD)" style="margin-bottom:0;">
+                                    <button onclick="addCurrency()" class="btn-primary" style="width:auto;">+</button>
                                 </div>
-                                <div id="currencyDisplay" style="margin-top:5px; font-size:0.8rem; color:var(--text-muted)"></div>
+                                <div id="currencyDisplay" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;"></div>
                             </div>
-                            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                                <button class="btn-danger" onclick="deleteCurrentTrip()">
-                                    <i class="fas fa-trash"></i> Delete Entire Trip
-                                </button>
+                            <div style="border-top: 1px solid var(--md-sys-color-outline-variant); padding-top: 16px;">
+                                <button class="btn-danger" onclick="deleteCurrentTrip()">Delete Trip</button>
                             </div>
                          </div>
                     </aside>
 
                     <main>
-                        <div class="card" style="border: 1px solid var(--primary);">
-                            <h3 style="color: var(--primary);"><i class="fas fa-receipt"></i> Add New Expense</h3>
+                        <div class="card" style="border: 1px solid var(--md-sys-color-primary-container);">
+                            <h3><span class="material-icons-round">receipt_long</span> Add Expense</h3>
                             
-                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
-                                <input type="text" id="descInput" placeholder="What was it?">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+                                <input type="text" id="descInput" placeholder="Description">
                                 <input type="number" id="amountInput" placeholder="0.00">
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
                                 <select id="currencySelect"></select>
                                 <select id="categorySelect">
-                                    <option value="Food">🍔 Food</option>
-                                    <option value="Travel">🚕 Travel</option>
-                                    <option value="Stay">🏨 Stay</option>
-                                    <option value="Fun">🍺 Fun</option>
-                                    <option value="Misc">📦 Misc</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Stay">Stay</option>
+                                    <option value="Fun">Fun</option>
+                                    <option value="Misc">Misc</option>
                                 </select>
                                 <select id="payerSelect"><option disabled selected>Who Paid?</option></select>
                             </div>
 
-                            <p style="margin: 15px 0 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
-                                Split with whom? (Select & Adjust Shares)
-                            </p>
-                            <div id="splitSelector" class="selection-grid"></div>
+                            <p style="margin: 24px 0 12px; font-weight: 500; color: var(--md-sys-color-on-background);">Split with whom?</p>
+                            
+                            <div id="splitSelector" class="split-grid"></div>
 
                             <button class="btn-primary" onclick="addExpense()">Add Expense</button>
                         </div>
 
                         <div class="card">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
                                 <h3>Recent Activity</h3>
-                                <h2 id="totalCostDisplay" style="color:white;">0.00</h2>
+                                <h2 id="totalCostDisplay" style="font-size: 1.5rem; color: var(--md-sys-color-primary);">0.00</h2>
                             </div>
                             <div id="expensesList"></div>
                         </div>
@@ -291,7 +423,6 @@
         import { getDatabase, ref, push, onValue, remove, set, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-        // 🔴 Keys Pre-Filled 🔴
         const firebaseConfig = {
             apiKey: "AIzaSyB1L79JF2HhJA_s7r_p3jsdMLi0tAYsTcc", 
             authDomain: "project008-d245d.firebaseapp.com",
@@ -314,12 +445,7 @@
         let expenses = [];
         let editingMemberId = null;
 
-        // --- AUTH ---
-        function showStatus(msg) {
-            const el = document.getElementById('statusMessage');
-            el.style.display = 'block';
-            el.innerHTML = `<strong>Status:</strong> ${msg}`;
-        }
+        function showStatus(msg) { document.getElementById('statusMessage').innerText = msg; }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -338,14 +464,12 @@
         });
 
         document.getElementById('googleLoginBtn').addEventListener('click', () => {
-            showStatus("Connecting...");
             signInWithPopup(auth, provider).catch((error) => {
-                showStatus(error.code === 'auth/unauthorized-domain' ? "DOMAIN ERROR: Whitelist this URL in Firebase Console." : error.message);
+                showStatus(error.code === 'auth/unauthorized-domain' ? "DOMAIN ERROR: Whitelist URL in Firebase." : error.message);
             });
         });
         window.logOut = () => { signOut(auth).then(() => location.reload()); }
 
-        // --- TRIPS ---
         function loadMyTrips() {
             onValue(ref(db, 'trips'), (snapshot) => {
                 const data = snapshot.val();
@@ -358,15 +482,13 @@
                         if (allowedEmails.includes(currentUser.email) || currentUser.email === ADMIN_EMAIL) {
                             list.innerHTML += `
                                 <div class="trip-card" onclick="loadTrip('${key}', '${val.meta.name}')">
-                                    <h4 style="margin:0;">${val.meta.name}</h4>
-                                    <div style="font-size:0.7rem; color:var(--text-muted); margin-top:5px;">
-                                        ${allowedEmails.length} Member(s)
-                                    </div>
+                                    <h2 style="font-size:1.5rem; color: inherit; margin-bottom: 8px;">${val.meta.name}</h2>
+                                    <p style="color: inherit; opacity: 0.8; font-size: 0.9rem;">${allowedEmails.length} Members</p>
                                 </div>`;
                         }
                     });
                 }
-                if(list.innerHTML === '') list.innerHTML = '<p style="color:gray;">No trips found. Start one!</p>';
+                if(list.innerHTML === '') list.innerHTML = '<p style="width:100%; text-align:center;">No trips found. Create one above!</p>';
             });
         }
 
@@ -395,10 +517,9 @@
             document.getElementById('tripSelectorView').classList.remove('hidden');
         }
         window.deleteCurrentTrip = () => {
-            if(confirm("⚠️ Delete this ENTIRE trip? Cannot be undone.")) { remove(ref(db, `trips/${currentTripId}`)); goHome(); }
+            if(confirm("Are you sure? This deletes everything.")) { remove(ref(db, `trips/${currentTripId}`)); goHome(); }
         }
 
-        // --- TRIP DATA ---
         function startTripListeners() {
             onValue(ref(db, `trips/${currentTripId}/travelers`), (s) => {
                 const data = s.val();
@@ -412,34 +533,30 @@
                 if(data) {
                     Object.entries(data).forEach(([k, v]) => {
                         travelers.push(v.name);
-                        const emailDisplay = v.email ? `<br><span style="font-size:0.65rem; color:var(--text-muted);">${v.email}</span>` : '';
+                        const emailDisplay = v.email ? `<span style="font-size:0.8rem; color:var(--md-sys-color-secondary); display:block;">${v.email}</span>` : '';
                         
                         list.innerHTML += `
-                            <div class="list-item">
-                                <div><span style="font-weight:600;">${v.name}</span>${emailDisplay}</div>
-                                <div class="action-icons">
-                                    <i class="fas fa-pen" style="color:var(--primary);" onclick="startEditMember('${k}', '${v.name}', '${v.email || ''}')"></i>
-                                    <i class="fas fa-trash" style="color:#ef4444;" onclick="deleteItem('travelers/${k}')"></i>
+                            <div class="list-row">
+                                <div><span style="font-weight:500;">${v.name}</span>${emailDisplay}</div>
+                                <div style="display:flex; gap:16px;">
+                                    <i class="fas fa-pen" style="color:var(--md-sys-color-primary); cursor:pointer;" onclick="startEditMember('${k}', '${v.name}', '${v.email || ''}')"></i>
+                                    <i class="fas fa-trash" style="color:var(--md-sys-color-error); cursor:pointer;" onclick="deleteItem('travelers/${k}')"></i>
                                 </div>
                             </div>`;
                         
                         let opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name;
                         payer.appendChild(opt);
 
-                        // --- SHARES CARD GENERATION ---
-                        // Note: Using a safe ID format by stripping spaces
                         const safeId = v.name.replace(/\s/g, '');
+                        // CHIP UI
                         selector.innerHTML += `
-                            <div class="person-card" id="card-${safeId}" onclick="togglePerson('${safeId}')">
-                                <i class="fas fa-user-circle"></i>
-                                <span style="font-size:0.8rem; font-weight:600;">${v.name}</span>
-                                
+                            <div class="person-chip" id="card-${safeId}" onclick="togglePerson('${safeId}')">
+                                <span style="font-weight:500;">${v.name}</span>
                                 <input type="checkbox" class="split-checkbox" value="${v.name}" id="cb-${safeId}">
-                                
                                 <div class="share-controls" onclick="event.stopPropagation()">
-                                    <button class="share-btn" onclick="changeShare('${safeId}', -1)">-</button>
-                                    <span class="share-count" id="share-${safeId}">1</span>x
-                                    <button class="share-btn" onclick="changeShare('${safeId}', 1)">+</button>
+                                    <button class="circle-btn" onclick="changeShare('${safeId}', -1)">-</button>
+                                    <span class="share-count" id="share-${safeId}">1</span>
+                                    <button class="circle-btn" onclick="changeShare('${safeId}', 1)">+</button>
                                 </div>
                             </div>`;
                     });
@@ -456,7 +573,7 @@
                 else { Object.entries(data).forEach(([k, v]) => { 
                     let opt = document.createElement('option'); opt.value = v.code; opt.innerText = v.code;
                     sel.appendChild(opt);
-                    display.innerHTML += `<span style="margin-right:5px; border:1px solid #555; padding:2px 4px; border-radius:4px;">${v.code}</span>`;
+                    display.innerHTML += `<span style="background:var(--md-sys-color-secondary-container); color:var(--md-sys-color-on-secondary-container); padding:4px 8px; border-radius:8px; font-size:0.8rem;">${v.code}</span>`;
                 }); }
             });
 
@@ -471,36 +588,26 @@
                     Object.entries(data).reverse().forEach(([k, v]) => {
                         expenses.push(v);
                         total += v.amount;
-                        let icon = 'fas fa-receipt';
-                        if(v.category === 'Food') icon = 'fas fa-utensils';
-                        if(v.category === 'Travel') icon = 'fas fa-taxi';
-                        if(v.category === 'Stay') icon = 'fas fa-bed';
-                        if(v.category === 'Fun') icon = 'fas fa-glass-cheers';
+                        let icon = 'receipt';
+                        if(v.category === 'Food') icon = 'restaurant';
+                        if(v.category === 'Travel') icon = 'local_taxi';
+                        if(v.category === 'Stay') icon = 'hotel';
+                        if(v.category === 'Fun') icon = 'celebration';
 
-                        // Detect split type for display
-                        let splitText = "";
-                        if(Array.isArray(v.involved)) {
-                            splitText = `Split equally among ${v.involved.length}`;
-                        } else {
-                            // It's an object (Weighted split)
-                            const count = Object.keys(v.involved).length;
-                            splitText = `Split by shares among ${count}`;
-                        }
+                        let splitText = Array.isArray(v.involved) ? `Equal split (${v.involved.length})` : `Shares split (${Object.keys(v.involved).length})`;
 
                         list.innerHTML += `
-                            <div class="list-item">
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:50%;">
-                                        <i class="${icon}" style="color:var(--primary);"></i>
-                                    </div>
+                            <div class="list-row">
+                                <div style="display:flex; align-items:center;">
+                                    <div class="icon-box"><i class="material-icons-round">${icon}</i></div>
                                     <div>
-                                        <div style="font-weight:600;">${v.desc} <span class="cat-tag">${v.category || 'Misc'}</span></div>
-                                        <div style="font-size:0.8rem; color:var(--text-muted);">${v.payer} • ${splitText}</div>
+                                        <div style="font-weight:500; font-size:1rem;">${v.desc}</div>
+                                        <div style="font-size:0.85rem; color:var(--md-sys-color-secondary);">${v.payer} • ${splitText}</div>
                                     </div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-weight:700;">${v.currency || ''} ${v.amount}</div>
-                                    <i class="fas fa-trash" style="font-size:0.8rem; color:#ef4444; opacity:0.6; cursor:pointer;" onclick="deleteItem('expenses/${k}')"></i>
+                                    <div style="font-weight:700; color:var(--md-sys-color-primary); font-size:1.1rem;">${v.currency || ''} ${v.amount}</div>
+                                    <i class="fas fa-trash" style="font-size:0.9rem; color:var(--md-sys-color-error); cursor:pointer; margin-top:4px;" onclick="deleteItem('expenses/${k}')"></i>
                                 </div>
                             </div>`;
                     });
@@ -510,12 +617,9 @@
             });
         }
 
-        // --- SHARES LOGIC ---
         window.togglePerson = (safeId) => {
             const card = document.getElementById(`card-${safeId}`);
             const checkbox = document.getElementById(`cb-${safeId}`);
-            
-            // Toggle Logic
             if(card.classList.contains('active')) {
                 card.classList.remove('active');
                 checkbox.checked = false;
@@ -529,33 +633,27 @@
             const span = document.getElementById(`share-${safeId}`);
             let val = parseInt(span.innerText);
             val += delta;
-            if(val < 1) val = 1; // Min 1 share
-            if(val > 10) val = 10; // Max 10 shares
+            if(val < 1) val = 1; if(val > 10) val = 10;
             span.innerText = val;
         }
 
-        // --- MEMBERS & ACTIONS ---
         window.startEditMember = (key, name, email) => {
             editingMemberId = key;
             document.getElementById('newMemberName').value = name;
             document.getElementById('newMemberEmail').value = (email === 'undefined') ? '' : email;
-            document.getElementById('addMemberBtn').innerText = "Update Member";
-            document.getElementById('addMemberBtn').style.background = "var(--success)";
+            document.getElementById('addMemberBtn').innerText = "Update";
         }
 
         window.addMember = () => {
             const name = document.getElementById('newMemberName').value;
             const email = document.getElementById('newMemberEmail').value;
             if(!name) { alert("Please enter a name."); return; }
-            
             const payload = { name: name, email: email };
-
             if(editingMemberId) {
                 update(ref(db, `trips/${currentTripId}/travelers/${editingMemberId}`), payload);
                 if(email && email.includes('@')) push(ref(db, `trips/${currentTripId}/accessList`), email);
                 editingMemberId = null;
-                document.getElementById('addMemberBtn').innerText = "Add to Squad";
-                document.getElementById('addMemberBtn').style.background = "";
+                document.getElementById('addMemberBtn').innerText = "Add Member";
             } else {
                 push(ref(db, `trips/${currentTripId}/travelers`), payload);
                 if(email && email.includes('@')) push(ref(db, `trips/${currentTripId}/accessList`), email);
@@ -576,76 +674,56 @@
             const category = document.getElementById('categorySelect').value;
             const payer = document.getElementById('payerSelect').value;
             
-            // --- NEW: COLLECT INVOLVED + SHARES ---
             const involvedData = {};
             let hasPeople = false;
-
             document.querySelectorAll('.split-checkbox:checked').forEach(cb => {
                 hasPeople = true;
                 const name = cb.value;
                 const safeId = name.replace(/\s/g, '');
-                // Read share count from DOM
                 const shareCount = parseInt(document.getElementById(`share-${safeId}`).innerText);
                 involvedData[name] = shareCount;
             });
 
             if(!desc || !amount || !payer || payer === "Who Paid?" || !hasPeople) {
-                alert("Please fill all fields and select split participants."); return;
+                alert("Please fill all fields."); return;
             }
 
             push(ref(db, `trips/${currentTripId}/expenses`), {
-                desc, amount, currency, category, payer, 
-                involved: involvedData, // Saving object {Name: ShareCount}
-                addedBy: currentUser.email,
-                date: Date.now()
+                desc, amount, currency, category, payer, involved: involvedData,
+                addedBy: currentUser.email, date: Date.now()
             });
 
             document.getElementById('descInput').value = '';
             document.getElementById('amountInput').value = '';
-            // Reset UI
-            document.querySelectorAll('.person-card').forEach(c => {
+            document.querySelectorAll('.person-chip').forEach(c => {
                 c.classList.remove('active');
-                c.querySelector('.share-count').innerText = "1"; // Reset shares to 1
+                c.querySelector('.share-count').innerText = "1";
             });
             document.querySelectorAll('.split-checkbox').forEach(c => c.checked = false);
         }
 
         window.deleteItem = (path) => { remove(ref(db, `trips/${currentTripId}/${path}`)); }
 
-        // --- UPDATED MATH FOR SHARES ---
         function recalc() {
             if(travelers.length === 0) return;
             let balances = {};
             travelers.forEach(t => { balances[t] = 0; });
-
             expenses.forEach(ex => {
                 const payer = ex.payer;
-                
-                // Add positive amount to payer (they are owed this)
                 if(balances[payer] !== undefined) balances[payer] += ex.amount;
-
-                // Handle Subtraction (Debts)
                 if(Array.isArray(ex.involved)) {
-                    // OLD LOGIC (Backward compatibility or Equal Split)
                     const splitAmt = ex.amount / ex.involved.length;
-                    ex.involved.forEach(p => {
-                        if(balances[p] !== undefined) balances[p] -= splitAmt;
-                    });
+                    ex.involved.forEach(p => { if(balances[p] !== undefined) balances[p] -= splitAmt; });
                 } else {
-                    // NEW LOGIC (Weighted/Shares)
-                    // ex.involved is { 'Alice': 1, 'Bob': 2 }
                     let totalShares = 0;
                     Object.values(ex.involved).forEach(s => totalShares += s);
-                    
                     const costPerShare = ex.amount / totalShares;
-                    
                     Object.entries(ex.involved).forEach(([person, shares]) => {
                         const debt = costPerShare * shares;
                         if(balances[person] !== undefined) balances[person] -= debt;
                     });
                 }
             });
-
             renderSettlements(simplifyDebts(balances));
         }
 
@@ -657,7 +735,6 @@
             });
             debtors.sort((a,b) => a.amount - b.amount);
             creditors.sort((a,b) => b.amount - a.amount);
-
             let transactions = [];
             let i=0, j=0;
             while(i < debtors.length && j < creditors.length) {
@@ -674,9 +751,9 @@
         function renderSettlements(txs) {
             const div = document.getElementById('simplifiedSettlements');
             div.innerHTML = '';
-            if(txs.length === 0) { div.innerHTML = '<div style="text-align:center; color:var(--success);">All Settle!</div>'; return; }
+            if(txs.length === 0) { div.innerHTML = '<div style="text-align:center; padding:10px;">All Settled!</div>'; return; }
             txs.forEach(t => {
-                div.innerHTML += `<div class="settle-row"><span><b>${t.from}</b> pays <b>${t.to}</b></span><span style="font-weight:bold; color:var(--success);">${t.amount.toFixed(2)}</span></div>`;
+                div.innerHTML += `<div class="settlement-card"><span>${t.from} pays ${t.to}</span><span>${t.amount.toFixed(2)}</span></div>`;
             });
         }
     </script>
